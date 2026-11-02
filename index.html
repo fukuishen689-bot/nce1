@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>新概念一册跟读</title>
+<meta name="theme-color" content="#EEF0EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161B1D" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="新概念跟读">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-size:15px;-webkit-text-size-adjust:100%}
+img{max-width:100%}[hidden]{display:none!important}
+</style>
+</head><body>
+
+<style>
+/* Layout: one narrow reading column, built for thumb use; lesson list → lesson view with three tabs, controls pinned near the bottom of each card */
+:root{
+  --bg:#EEF0EE; --surface:#F8F9F7; --ink:#1F2629; --muted:#66706F; --line:#D5DAD6;
+  --sea:#3F6670; --sea-soft:#DCE6E6; --rec:#A5503F; --ok:#4E7A5A;
+  --f-en:"Newsreader",Georgia,"Times New Roman",serif;
+  --f-zh:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#161B1D; --surface:#1E2427; --ink:#E4E8E6; --muted:#97A19F; --line:#2F383B;
+  --sea:#86AFB8; --sea-soft:#25363A; --rec:#D98C79; --ok:#8DBB98; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#161B1D; --surface:#1E2427; --ink:#E4E8E6; --muted:#97A19F; --line:#2F383B;
+  --sea:#86AFB8; --sea-soft:#25363A; --rec:#D98C79; --ok:#8DBB98; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-zh);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 32px}
+.wrap{max-width:560px;margin:0 auto}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,input:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+.en{font-family:var(--f-en)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+header.top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:20px 0 14px}
+header.top h1{font-size:19px;font-weight:700;margin:0;letter-spacing:.02em}
+header.top .sub{color:var(--muted);font-size:12px}
+.resume{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;
+  background:var(--sea);color:var(--surface);border-radius:14px;padding:16px 18px;margin-bottom:22px}
+.resume small{display:block;opacity:.8;font-size:12px}
+.resume .en{font-size:21px;line-height:1.25}
+.resume .go{font-size:13px;white-space:nowrap;border:1px solid currentColor;border-radius:99px;padding:4px 12px;opacity:.9}
+.label{font-size:12px;letter-spacing:.12em;color:var(--muted);margin:0 0 8px}
+.list{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;text-align:left;width:100%;
+  padding:13px 2px;border-bottom:1px solid var(--line)}
+.row .num{color:var(--muted);font-size:12px}
+.row .t{font-family:var(--f-en);font-size:18px;line-height:1.25;min-width:0}
+.row .g{display:block;font-family:var(--f-zh);font-size:12px;color:var(--muted);margin-top:2px}
+.dot{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--line)}
+.dot.part{border-color:var(--sea)}
+.dot.done{background:var(--ok);border-color:var(--ok)}
+.note{color:var(--muted);font-size:12.5px;margin-top:18px;line-height:1.7}
+
+/* lesson view */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:12px 0 10px;display:flex;flex-direction:column;gap:10px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.bar .head{display:flex;align-items:center;gap:10px}
+.back{font-size:14px;color:var(--sea);padding:6px 8px 6px 0}
+.bar h2{margin:0;font-family:var(--f-en);font-weight:500;font-size:20px;line-height:1.2;flex:1;min-width:0;text-wrap:balance}
+.bar .lnum{font-size:12px;color:var(--muted)}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px}
+.tabs button{padding:8px 0;border-radius:7px;font-size:14px;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--sea-soft);color:var(--ink);font-weight:500}
+.panel{padding-top:8px}
+
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{font-size:13px;border:1px solid var(--line);border-radius:99px;padding:5px 12px;background:var(--surface)}
+.chip[aria-pressed="true"]{border-color:var(--sea);color:var(--sea)}
+.words{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.w{display:grid;grid-template-columns:1fr auto 36px;align-items:center;gap:10px;padding:11px 12px 11px 16px;border-bottom:1px solid var(--line);text-align:left;width:100%}
+.w:last-child{border-bottom:0}
+.w .e{font-family:var(--f-en);font-size:19px;min-width:0}
+.w .z{font-size:14px;color:var(--muted);text-align:right;transition:filter .15s}
+.hide .w .z{filter:blur(6px)}
+.hide .w.peek .z{filter:none}
+.w.playing{background:var(--sea-soft)}
+.star{font-size:17px;color:var(--line);text-align:center;padding:4px 0}
+.star.on{color:var(--rec)}
+
+.gram h3{font-size:16px;margin:4px 0 6px}
+.gram p{margin:0 0 12px;max-width:34em}
+.ex{display:flex;flex-direction:column;gap:2px;border-left:2px solid var(--sea);padding:2px 0 2px 14px;margin:14px 0}
+.ex button{text-align:left;font-family:var(--f-en);font-size:18px;line-height:1.35;padding:4px 0}
+.ex .zh{font-size:13px;color:var(--muted);margin-bottom:6px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px 18px 18px;display:flex;flex-direction:column;gap:14px}
+.card .pos{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.card .sent{font-family:var(--f-en);font-size:27px;line-height:1.3;margin:6px 0 0;text-wrap:balance;min-height:2.6em}
+.card .sent .wd{border-radius:4px;transition:background .1s}
+.card .sent .wd.on{background:var(--sea-soft)}
+.card .czh{font-size:14px;color:var(--muted);min-height:1.6em}
+.card .czh.hid{filter:blur(6px)}
+.ctrls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{border:1px solid var(--line);border-radius:12px;padding:13px 6px;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--bg)}
+.btn.primary{background:var(--sea);border-color:var(--sea);color:var(--surface)}
+.btn.rec{color:var(--rec);border-color:var(--rec)}
+.btn.rec.live{background:var(--rec);color:var(--surface)}
+.btn[disabled]{opacity:.4;cursor:default}
+.ico{width:16px;height:16px;flex:none}
+.steps{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.steps .btn{flex:1}
+.tally{font-size:12.5px;color:var(--muted);text-align:center}
+.tally b{color:var(--ok);font-weight:500}
+.how{font-size:12.5px;color:var(--muted);margin-top:14px;line-height:1.75}
+.upload{display:none;font-size:13px;color:var(--muted);gap:8px;align-items:center;flex-wrap:wrap}
+.upload.show{display:flex}
+.upload label{border:1px dashed var(--rec);color:var(--rec);border-radius:10px;padding:8px 12px;cursor:pointer}
+.upload input{position:absolute;width:1px;height:1px;opacity:0}
+.finish{width:100%;margin-top:18px}
+.ipa,.sym{font-family:"Charis SIL","Doulos SIL","Lucida Sans Unicode","Segoe UI","Noto Sans",sans-serif}
+.phbtn{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 16px;margin:-8px 0 22px}
+.phbtn small{display:block;font-size:12px;color:var(--muted)}
+.phbtn .ipa{color:var(--sea);font-size:17px;white-space:nowrap}
+.wl{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+.w .ipa{font-size:14px;color:var(--sea);padding:1px 0;text-align:left;border-bottom:1px dotted var(--sea);line-height:1.4}
+.us{font-size:11.5px;color:var(--muted);margin-top:2px}
+.gp{padding:6px 0 18px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.gp:last-of-type{border-bottom:0}
+.gk,.ek{font-size:11.5px;letter-spacing:.1em;color:var(--muted);margin:0 0 4px}
+.gb{color:var(--ink)}
+.forms{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.fr{display:grid;grid-template-columns:76px 1fr;align-items:baseline;gap:10px;padding:9px 14px;border-bottom:1px solid var(--line)}
+.fr:last-child{border-bottom:0}
+.fl{font-size:12px;color:var(--muted)}
+.fe{font-family:var(--f-en);font-size:17.5px;line-height:1.35;text-align:left;min-width:0}
+.fe:active{color:var(--sea)}
+.errs{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+.er{padding:0 0 0 2px}
+.bad,.good{display:flex;gap:8px;align-items:baseline}
+.bad s{font-family:var(--f-en);font-size:16px;color:var(--rec);text-decoration-thickness:1px}
+.good .fe{color:var(--ok)}
+.mk{font-size:13px;width:14px;flex:none}
+.bad .mk{color:var(--rec)} .good .mk{color:var(--ok)}
+.why{font-size:12.5px;color:var(--muted);padding-left:22px}
+.ext .xr{padding:6px 0}
+.ext .xr p{margin:0;font-size:13.5px;color:var(--muted)}
+.quiz{display:flex;flex-direction:column;gap:8px}
+.qz{display:flex;justify-content:space-between;align-items:baseline;gap:12px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 14px}
+.qq{font-family:var(--f-en);font-size:16.5px;min-width:0}
+.qa{font-size:13px;color:var(--sea);white-space:nowrap;filter:blur(5px);transition:filter .15s}
+.qz.show .qa{filter:none}
+.qz.show{border-color:var(--sea)}
+.phs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:420px){.phs{grid-template-columns:1fr}}
+.ph{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.phh{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.sym{font-size:26px;color:var(--sea);line-height:1.1}
+.pht{font-size:11.5px;color:var(--muted)}
+.tip{font-size:12.5px;color:var(--muted);margin:0;line-height:1.6}
+.phx{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.pw{font-family:var(--f-en);font-size:17px;border:1px solid var(--line);border-radius:8px;padding:3px 10px;background:var(--bg)}
+.pw b{color:var(--sea);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.pw.on{border-color:var(--sea);background:var(--sea-soft)}
+#sheet{position:fixed;inset:0;z-index:20}
+.sh-bg{position:absolute;inset:0;background:rgba(10,14,16,.45)}
+.sh{position:absolute;left:0;right:0;bottom:0;max-height:82%;overflow-y:auto;background:var(--bg);border-radius:18px 18px 0 0;
+  padding:16px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sh>*{max-width:560px;margin-left:auto;margin-right:auto}
+.shh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.shw{font-size:26px}
+.ipa.big{font-size:18px;color:var(--sea);flex:1}
+.shx{font-size:14px;color:var(--sea)}
+.hr{display:flex;align-items:center;gap:10px}
+.rate{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.rate input{flex:1;min-width:0;accent-color:var(--sea)}
+.vr .vn{font-size:16px}
+.vr.sel{background:var(--sea-soft)}
+.vr.sel .z{color:var(--sea)}
+.guide{margin-top:22px;font-size:13px;line-height:1.75;color:var(--muted)}
+.guide p{margin:0 0 10px}
+.guide b{color:var(--ink);font-weight:500}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);font-size:13px;padding:8px 14px;border-radius:99px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:.92}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap" id="app"></div>
+<div class="toast" id="toast" role="status"></div>
+<div id="sheet" hidden></div>
+
+<script>
+/* 每单元 = 新概念一册的一对课（奇数课课文 + 偶数课练习）。
+   单词与语法点对应教材；跟读句为自编练习句，不是课文原文。 */
+const U=[
+{n:1,t:"Excuse me!",g:"一般疑问句 Is this your…?",gb:"把 be 动词 is 提到句首就变成疑问句。肯定回答 Yes, it is.，否定回答 No, it isn't.（isn't = is not）。回答时不能缩写成 Yes, it's.",gx:[["This is your pen.","这是你的笔。"],["Is this your pen?","这是你的笔吗？"]],w:[["excuse","原谅"],["me","我（宾格）"],["yes","是的"],["this","这"],["your","你的，你们的"],["handbag","女用手提包"],["pardon","原谅，请再说一遍"],["it","它"],["thank you","谢谢你"],["very much","非常地"],["pen","钢笔"],["pencil","铅笔"],["watch","手表"],["coat","上衣，外衣"],["skirt","裙子"],["shirt","衬衫"],["house","房子"]],s:[["Excuse me.","对不起，打扰一下。"],["Is this your key?","这是你的钥匙吗？"],["Yes, it is.","是的，是我的。"],["Is this your coat? No, it isn't.","这是你的外衣吗？不，不是。"],["Pardon?","请再说一遍？"],["Thank you very much.","非常感谢。"]]},
+{n:3,t:"Sorry, sir.",g:"祈使句 + please；数字 1–10",gb:"请别人做事，用名词或动词原形开头，加 please 更礼貌：My coat, please.  Here is… 意思是「给你…」。数字 one 到 ten 要能脱口而出。",gx:[["My umbrella, please.","请把我的伞给我。"],["Here is your ticket.","这是您的票。"]],w:[["umbrella","伞"],["please","请"],["here","这里"],["my","我的"],["ticket","票"],["number","号码"],["five","五"],["sorry","对不起"],["sir","先生"],["cloakroom","衣帽存放处"],["suit","一套衣服"],["school","学校"],["teacher","老师"],["son","儿子"],["daughter","女儿"]],s:[["My coat and my umbrella, please.","请把我的外衣和伞给我。"],["Here is your ticket.","这是您的票。"],["Number seven.","七号。"],["Sorry, sir. This isn't your umbrella.","对不起，先生，这不是您的伞。"],["Here's your key, sir.","先生，这是您的钥匙。"]]},
+{n:5,t:"Nice to meet you.",g:"介绍他人；国籍形容词",gb:"介绍用 This is…。说国籍：主语 + be + 国籍形容词，如 He is Chinese.  问车或物品的牌子用 What make is it?",gx:[["This is Mr. Wang.","这位是王先生。"],["He is Chinese.","他是中国人。"]],w:[["Mr.","先生"],["good","好"],["morning","早晨"],["Miss","小姐"],["new","新的"],["student","学生"],["French","法国人，法国的"],["German","德国人，德国的"],["nice","美好的"],["meet","遇见"],["Japanese","日本人，日本的"],["Korean","韩国人，韩国的"],["Chinese","中国人，中国的"],["too","也"],["make","牌子"],["English","英国人，英国的"],["American","美国人，美国的"],["Italian","意大利人，意大利的"]],s:[["Good morning.","早上好。"],["This is Miss Li. She's a new student.","这位是李小姐，她是新同学。"],["He's Chinese.","他是中国人。"],["Nice to meet you.","很高兴认识你。"],["What make is it? It's a German car.","这是什么牌子？是德国车。"]]},
+{n:7,t:"Are you a teacher?",g:"am / is / are；a 与 an",gb:"I 配 am，you 配 are，he/she/it 配 is。问职业：What's your job?  元音音素开头的词前用 an：an engineer, an air hostess。",gx:[["I am an engineer.","我是工程师。"],["What's your job?","你做什么工作？"]],w:[["I","我"],["am","是"],["are","是"],["name","名字"],["what","什么"],["nationality","国籍"],["job","工作"],["engineer","工程师"],["policeman","警察"],["taxi driver","出租车司机"],["postman","邮递员"],["nurse","护士"],["mechanic","机械师"],["hairdresser","理发师"],["housewife","家庭主妇"]],s:[["What's your name? My name's Fukui.","你叫什么名字？我叫 Fukui。"],["What nationality are you? I'm Chinese.","你是哪国人？我是中国人。"],["Are you a teacher? No, I'm not.","你是老师吗？不是。"],["What's your job? I'm a manager.","你做什么工作？我是经理。"],["She's an engineer.","她是工程师。"]]},
+{n:9,t:"How are you today?",g:"问候语；形容词作表语",gb:"How are you? 回答 I'm fine / very well, thank you. And you?  形容词放在 be 后面描述人或物：He is busy. 否定加 not：He isn't lazy.",gx:[["How is Tim today?","蒂姆今天怎么样？"],["He's very well.","他很好。"]],w:[["hello","喂，你好"],["hi","你好"],["how","怎样"],["today","今天"],["well","身体好"],["fine","美好的"],["thanks","谢谢"],["goodbye","再见"],["see","见"],["fat","胖的"],["thin","瘦的"],["tall","高的"],["short","矮的"],["dirty","脏的"],["clean","干净的"],["hot","热的"],["cold","冷的"],["old","老的"],["young","年轻的"],["busy","忙的"],["lazy","懒的"]],s:[["Hello. How are you today?","你好，今天怎么样？"],["I'm very well, thank you. And you?","我很好，谢谢。你呢？"],["I'm fine, thanks.","我很好，谢谢。"],["He isn't busy. He's lazy.","他不忙，他是懒。"],["See you tomorrow.","明天见。"]]},
+{n:11,t:"Is this your shirt?",g:"Whose…? 名词所有格 's",gb:"问「谁的」用 Whose is this? / Whose shirt is this?  人名或名词后加 's 表示所属：Tim's shirt, my brother's car。他的 his，她的 her。",gx:[["Whose shirt is this?","这是谁的衬衫？"],["It's Tim's.","是蒂姆的。"]],w:[["whose","谁的"],["blue","蓝色的"],["perhaps","大概"],["white","白色的"],["catch","抓住"],["father","父亲"],["mother","母亲"],["blouse","女衬衫"],["sister","姐妹"],["tie","领带"],["brother","兄弟"],["his","他的"],["her","她的"]],s:[["Whose shirt is that?","那是谁的衬衫？"],["It's my brother's.","是我哥哥的。"],["Is this your tie? No, it's his tie.","这是你的领带吗？不，是他的。"],["Whose bag is this? It's her bag.","这是谁的包？是她的。"],["Here, catch!","给，接住！"]]},
+{n:13,t:"A new dress",g:"What colour…? 形容词修饰名词",gb:"问颜色：What colour is your coat? 回答 It's grey.  形容词放在名词前：a new dress, a lovely hat。the same colour 意思是「同样的颜色」。",gx:[["What colour is your hat?","你的帽子是什么颜色？"],["It's a green hat.","是一顶绿帽子。"]],w:[["colour","颜色"],["green","绿色"],["come","来"],["upstairs","楼上"],["smart","时髦的"],["hat","帽子"],["same","相同的"],["lovely","可爱的"],["case","箱子"],["carpet","地毯"],["dog","狗"],["grey","灰色"],["yellow","黄色"],["black","黑色"],["orange","橘黄色"],["red","红色"],["brown","棕色"]],s:[["What colour is your new coat? It's grey.","你的新外衣是什么颜色？灰色。"],["Come upstairs and see it.","上楼来看看。"],["It's a lovely hat.","这顶帽子真好看。"],["My hat is the same colour.","我的帽子是同样的颜色。"],["Your car is very smart.","你的车很漂亮。"]]},
+{n:15,t:"Your passports, please.",g:"名词复数；are 与 we / they",gb:"复数主语配 are：We are tourists. They are friends.  名词一般加 s 变复数：passport → passports。问句把 are 提前：Are you Swedish?",gx:[["Are you French?","你们是法国人吗？"],["No, we aren't. We're Chinese.","不是，我们是中国人。"]],w:[["customs","海关"],["officer","官员"],["girl","女孩"],["Danish","丹麦人，丹麦的"],["friend","朋友"],["Norwegian","挪威人，挪威的"],["passport","护照"],["tourist","旅游者"]],s:[["Are you Swedish? No, we aren't.","你们是瑞典人吗？不是。"],["We're Chinese.","我们是中国人。"],["Are your friends tourists? Yes, they are.","你的朋友是游客吗？是的。"],["Your passports, please.","请出示护照。"],["Are these your cases? Yes, they are.","这些是你们的箱子吗？是的。"]]},
+{n:17,t:"How do you do?",g:"Who…? 复数名词与不规则复数",gb:"问人用 Who is this? / Who are they?  有些名词复数不加 s：man → men，woman → women，child → children。How do you do? 是初次见面的正式问候，对方也回 How do you do?",gx:[["Who are these men?","这些男人是谁？"],["They're sales reps.","他们是推销员。"]],w:[["employee","雇员"],["hard-working","勤奋的"],["sales rep","推销员"],["man","男人"],["office","办公室"],["assistant","助手"],["woman","女人"]],s:[["Come and meet our employees.","来见见我们的员工。"],["How do you do?","您好。"],["Who is this young woman?","这位年轻女士是谁？"],["They're very hard-working.","他们非常勤奋。"],["What are their jobs? They're office assistants.","他们做什么工作？是办公室助理。"]]},
+{n:19,t:"Tired and thirsty",g:"What's the matter? 形容词描述状态",gb:"关心别人：What's the matter? 回答 I'm tired / thirsty.  对立形容词成对记：big / small, open / shut, light / heavy, long / short。",gx:[["What's the matter, children?","孩子们，怎么了？"],["We're tired and thirsty.","我们又累又渴。"]],w:[["matter","事情"],["children","孩子们"],["tired","累的"],["boy","男孩"],["thirsty","渴的"],["mum","妈妈"],["sit down","坐下"],["right","好，可以"],["ice cream","冰淇淋"],["big","大的"],["small","小的"],["open","开着的"],["shut","关着的"],["light","轻的"],["heavy","重的"],["long","长的"],["shoe","鞋"]],s:[["What's the matter?","怎么了？"],["We're tired and thirsty.","我们又累又渴。"],["Sit down here.","坐这儿吧。"],["Are you all right now?","现在好些了吗？"],["These shoes are very heavy.","这双鞋很重。"]]},
+{n:21,t:"Which book?",g:"宾格代词 me / him / her / us / them",gb:"动词后面用宾格：Give me a book. Give it to him.  问「哪一个」用 Which one? 回答 This one. / The red one.  give 后可接两个宾语：Give him the book.",gx:[["Give me a glass, please.","请给我一个杯子。"],["Which one? This one?","哪一个？这个吗？"]],w:[["give","给"],["one","一个"],["which","哪一个"],["empty","空的"],["full","满的"],["large","大的"],["little","小的"],["sharp","尖的，锋利的"],["blunt","钝的"],["box","盒子"],["glass","玻璃杯"],["cup","茶杯"],["bottle","瓶子"],["tin","罐头"],["knife","刀"],["fork","叉子"]],s:[["Give me a cup, please.","请给我一个杯子。"],["Which one?","哪一个？"],["This one? No, the large one.","这个吗？不，大的那个。"],["Give it to me.","把它给我。"],["Give them the keys.","把钥匙给他们。"]]},
+{n:23,t:"Which glasses?",g:"介词短语作后置定语",gb:"介词短语放在名词后面说明是哪一个：the glasses on the shelf（架子上的那些杯子）。复数用 the ones：The ones on the shelf?",gx:[["Which books?","哪些书？"],["The ones on the table.","桌子上的那些。"]],w:[["on","在…之上"],["shelf","架子"],["desk","书桌"],["table","桌子"],["plate","盘子"],["cupboard","橱柜"],["television","电视机"],["floor","地板"],["dressing table","梳妆台"],["magazine","杂志"],["bed","床"],["newspaper","报纸"]],s:[["Give me some glasses, please.","请给我几个杯子。"],["Which glasses?","哪些杯子？"],["The ones on the shelf.","架子上的那些。"],["Here you are.","给你。"],["The cups on the table are clean.","桌上的杯子是干净的。"]]},
+{n:25,t:"Mrs Smith's kitchen",g:"There is…；Where is…?",gb:"说「某处有某物」：There is a + 单数名词 + 地点。问位置：Where is the cooker? 回答 It's on the right.  in the middle of 在…中间。",gx:[["There's a cooker in the kitchen.","厨房里有个炉子。"],["Where is it? It's on the left.","在哪？在左边。"]],w:[["Mrs","夫人"],["kitchen","厨房"],["refrigerator","电冰箱"],["electric","电的"],["left","左边"],["cooker","炉子"],["right","右边"],["middle","中间"],["of","…的"],["room","房间"],["where","在哪里"]],s:[["There's a refrigerator in the kitchen.","厨房里有一台冰箱。"],["Where's the cooker? It's on the right.","炉子在哪？在右边。"],["There's a table in the middle of the room.","房间中间有张桌子。"],["There's a bottle on the table.","桌上有一个瓶子。"],["Where's the cup? It's on the shelf.","杯子在哪？在架子上。"]]},
+{n:27,t:"Mrs Smith's living room",g:"There are…；some 与 any",gb:"复数用 There are some…。疑问和否定句里 some 通常换成 any：Are there any books? There aren't any books.",gx:[["There are some books on the shelf.","架子上有一些书。"],["Are there any pictures on the wall?","墙上有画吗？"]],w:[["living room","客厅"],["near","靠近"],["window","窗户"],["armchair","扶手椅"],["door","门"],["picture","图画"],["wall","墙"]],s:[["There are some books on the shelf.","架子上有一些书。"],["There's an armchair near the window.","窗边有一把扶手椅。"],["Are there any pictures on the wall? Yes, there are.","墙上有画吗？有。"],["There aren't any magazines on the table.","桌上没有杂志。"],["The door is on the left.","门在左边。"]]},
+{n:29,t:"Come in, Amy.",g:"祈使句；must 表示必须",gb:"动词原形开头表示命令或请求：Shut the door.  must + 动词原形表示「必须」：You must open the window.  动词短语：put…in, turn on / off。",gx:[["Shut the door, please.","请关上门。"],["You must make the bed.","你必须把床铺好。"]],w:[["shut","关门"],["bedroom","卧室"],["untidy","乱的"],["must","必须"],["open","打开"],["air","使通风"],["put","放"],["clothes","衣服"],["wardrobe","衣柜"],["dust","掸灰"],["sweep","扫"],["read","读"],["throw","扔"],["turn on","打开（电器）"],["turn off","关上（电器）"]],s:[["Come in and shut the door, please.","请进来，把门关上。"],["This room is very untidy.","这个房间很乱。"],["You must open the window and air the room.","你得开窗给房间通通风。"],["Put your clothes in the wardrobe.","把你的衣服放进衣柜。"],["Turn off the light, please.","请把灯关掉。"]]},
+{n:31,t:"Where's Sally?",g:"现在进行时 be + doing",gb:"表示「正在做」：am / is / are + 动词-ing。问：What is she doing? 答：She is sitting under the tree.  变 -ing：多数直接加；sit → sitting（双写）；make → making（去 e）。",gx:[["What's he doing?","他在做什么？"],["He's climbing the tree.","他在爬树。"]],w:[["garden","花园"],["under","在…之下"],["tree","树"],["climb","爬"],["who","谁"],["run","跑"],["grass","草地"],["after","在…之后"],["across","横过"],["cat","猫"],["eat","吃"],["type","打字"],["wash","洗"],["cook","做饭"],["cry","哭"],["wait","等"],["jump","跳"]],s:[["Where's Sally? She's in the garden.","萨莉在哪？在花园里。"],["What's she doing? She's sitting under the tree.","她在做什么？坐在树下。"],["The dog is running across the grass.","狗正跑过草地。"],["He's climbing the tree.","他在爬树。"],["I'm waiting for a bus.","我在等公共汽车。"]]},
+{n:33,t:"A fine day",g:"现在进行时（复数主语）",gb:"复数主语用 are + -ing：They are walking over the bridge.  It is a fine day. 描述天气。shine → shining，swim → swimming。",gx:[["What are the children doing?","孩子们在做什么？"],["They're swimming in the river.","他们在河里游泳。"]],w:[["day","日子"],["cloud","云"],["shine","照耀"],["sun","太阳"],["with","和…一起"],["family","家庭"],["walk","散步"],["over","跨越"],["bridge","桥"],["boat","船"],["river","河"],["ship","轮船"],["aeroplane","飞机"],["sky","天空"]],s:[["It's a fine day today.","今天天气很好。"],["There are some clouds in the sky.","天上有几朵云。"],["The sun is shining.","阳光明媚。"],["We are walking over the bridge.","我们正走过桥。"],["What are the children doing? They're swimming.","孩子们在做什么？在游泳。"]]},
+{n:35,t:"Our village",g:"方位介词 between / along / into / beside",gb:"between 两者之间，along 沿着，into 进入，beside 在旁边，off 离开，across 横穿，over 越过，under 在下面。介词后接名词或宾格代词。",gx:[["The village is between two hills.","村子在两座山之间。"],["They're walking along the river.","他们沿着河边走。"]],w:[["photograph","照片"],["village","村庄"],["valley","山谷"],["between","在…之间"],["hill","小山"],["another","另一个"],["wife","妻子"],["along","沿着"],["bank","河岸"],["water","水"],["swim","游泳"],["building","建筑物"],["park","公园"],["into","进入"],["beside","在…旁边"],["off","离开"]],s:[["This is a photograph of our village.","这是我们村子的照片。"],["Our village is in a valley.","我们村在山谷里。"],["It is between two hills.","它在两座山之间。"],["We're walking along the bank of the river.","我们正沿着河岸散步。"],["The boat is going under the bridge.","船正从桥下穿过。"]]},
+{n:37,t:"Making a bookcase",g:"be going to 表示打算",gb:"打算做某事：am / is / are going to + 动词原形。问：What are you going to do? 答：I'm going to paint it.",gx:[["What are you going to do?","你打算做什么？"],["I'm going to paint it pink.","我打算把它漆成粉色。"]],w:[["work","工作"],["hard","努力地"],["make","做"],["bookcase","书架"],["going to","将要"],["paint","上漆"],["pink","粉红色"],["favourite","最喜欢的"],["homework","作业"],["listen","听"],["dish","盘子"]],s:[["You're working very hard.","你干得很卖力。"],["What are you going to do?","你打算干什么？"],["I'm going to paint it pink.","我打算把它漆成粉色。"],["Pink is my favourite colour.","粉色是我最喜欢的颜色。"],["I'm going to clean the rooms this afternoon.","我下午打算打扫房间。"]]},
+{n:39,t:"Don't drop it!",g:"going to + 双宾语；否定祈使句 Don't…",gb:"show / give / send / take 可以接人和物：show it to my wife = show my wife it。禁止或提醒：Don't + 动词原形：Don't drop it!",gx:[["I'm going to show it to her.","我要拿给她看。"],["Be careful! Don't drop it!","小心，别摔了！"]],w:[["front","前面"],["in front of","在…之前"],["careful","小心的"],["vase","花瓶"],["drop","掉下"],["flower","花"],["show","给…看"],["send","送，寄"],["take","带走"]],s:[["What are you going to do with that vase?","你要拿那个花瓶做什么？"],["I'm going to put it on the table.","我要把它放在桌上。"],["Be careful! Don't drop it!","小心！别摔了！"],["I'm going to show it to my wife.","我要拿给我妻子看。"],["Don't put it there.","别放那儿。"]]},
+{n:41,t:"Penny's bag",g:"不可数名词与量词",gb:"不可数名词不能直接加 a 或 s，要用量词：a loaf of bread, a bar of chocolate, a pound of sugar, a cup of tea。",gx:[["There's a loaf of bread in the bag.","包里有一条面包。"],["Is there any sugar?","有糖吗？"]],w:[["cheese","奶酪"],["bread","面包"],["soap","肥皂"],["chocolate","巧克力"],["sugar","糖"],["coffee","咖啡"],["tea","茶"],["tobacco","烟草"],["a bar of","一块，一条"],["a loaf of","一个（面包）"],["a pound of","一磅"]],s:[["Is that bag heavy? Not very.","那个包重吗？不太重。"],["There's a loaf of bread in it.","里面有一条面包。"],["Is there any sugar?","有糖吗？"],["There's a bar of chocolate.","有一块巧克力。"],["A cup of tea, please.","请来一杯茶。"]]},
+{n:43,t:"Hurry up!",g:"情态动词 can",gb:"can + 动词原形表示「能，会」。问句把 can 提前：Can you make the tea? 回答 Yes, I can. / No, I can't.  can 后面的动词永远用原形。",gx:[["Can you make the tea?","你会泡茶吗？"],["Yes, of course I can.","当然会。"]],w:[["can","能，会"],["of course","当然"],["now","现在"],["find","找到"],["kettle","水壶"],["behind","在…之后"],["teapot","茶壶"],["boil","沸腾"]],s:[["Can you make the tea?","你能泡一下茶吗？"],["Yes, of course I can.","当然可以。"],["I can't find the kettle.","我找不到水壶。"],["The water is boiling.","水开了。"],["Can you come here, please?","你能过来一下吗？"]]},
+{n:45,t:"The boss's letter",g:"can 的疑问与否定；Can I…?",gb:"Can I…? 表示请求许可或主动帮忙：Can I help you?  否定 can't = cannot：I can't read it.",gx:[["Can you type this letter?","你能打一下这封信吗？"],["I can't read it.","我看不懂。"]],w:[["boss","老板"],["minute","分钟"],["ask","请求"],["handwriting","书写"],["terrible","糟糕的"],["lift","提起"]],s:[["Can you come here a minute, please?","你能过来一下吗？"],["Can you type this letter for me?","你能帮我打一下这封信吗？"],["I can't read it.","我看不懂。"],["His handwriting is terrible.","他的字太难认了。"],["Can I help you?","需要帮忙吗？"]]},
+{n:47,t:"A cup of coffee",g:"一般现在时 do / don't",gb:"表示喜好、习惯用一般现在时。问句借助 do：Do you like coffee? 回答 Yes, I do. / No, I don't.  否定：I don't like sugar.",gx:[["Do you like coffee?","你喜欢咖啡吗？"],["Yes, I do. But I don't want any sugar.","喜欢，但不要糖。"]],w:[["like","喜欢"],["want","想要"],["fresh","新鲜的"],["egg","鸡蛋"],["butter","黄油"],["pure","纯的"],["honey","蜂蜜"],["ripe","熟的"],["banana","香蕉"],["jam","果酱"],["sweet","甜的"],["orange","橙子"],["wine","葡萄酒"],["beer","啤酒"]],s:[["Do you like coffee? Yes, I do.","你喜欢咖啡吗？喜欢。"],["Do you want a cup?","你想来一杯吗？"],["Do you want any milk? No, thank you.","要加牛奶吗？不用，谢谢。"],["I don't like sugar.","我不喜欢加糖。"],["Do you like fresh eggs for breakfast?","你早餐喜欢吃新鲜鸡蛋吗？"]]},
+{n:49,t:"At the butcher's",g:"第三人称单数 likes / doesn't",gb:"主语是 he / she / it 时，动词加 s：He likes beef.  疑问与否定借助 does，动词回到原形：Does he like lamb? He doesn't like lamb.  否定句里的「也」用 either。",gx:[["Does your husband like beef?","你丈夫喜欢牛肉吗？"],["Yes, he does. But he doesn't like lamb.","喜欢，但他不喜欢羊肉。"]],w:[["butcher","卖肉的"],["meat","肉"],["beef","牛肉"],["lamb","羊肉"],["husband","丈夫"],["steak","牛排"],["mince","肉末"],["chicken","鸡肉"],["tell","告诉"],["truth","实情"],["either","也（用于否定）"],["tomato","西红柿"],["potato","土豆"],["cabbage","卷心菜"],["pear","梨"],["grape","葡萄"],["peach","桃"]],s:[["Do you want any meat today?","今天要买肉吗？"],["My husband likes beef, but he doesn't like lamb.","我丈夫喜欢牛肉，但不喜欢羊肉。"],["Does he like steak?","他喜欢牛排吗？"],["I don't like chicken either.","我也不喜欢鸡肉。"],["What does your wife like?","你妻子喜欢什么？"]]},
+{n:51,t:"A pleasant climate",g:"一般现在时 + 频度副词",gb:"频度副词：always 总是，often 经常，sometimes 有时，never 从不。放在实义动词前、be 动词后：It often rains. It is always warm.  问天气：What's the climate like?",gx:[["What's the climate like in your country?","你们国家气候怎么样？"],["It often rains in spring.","春天经常下雨。"]],w:[["Greece","希腊"],["climate","气候"],["country","国家"],["pleasant","宜人的"],["weather","天气"],["spring","春天"],["windy","有风的"],["warm","温暖的"],["rain","下雨"],["sometimes","有时"],["summer","夏天"],["autumn","秋天"],["winter","冬天"],["snow","下雪"],["January","一月"],["April","四月"],["July","七月"],["October","十月"]],s:[["Where do you come from? I come from China.","你是哪里人？我来自中国。"],["What's the climate like in your country?","你们国家气候怎么样？"],["It's very pleasant.","非常宜人。"],["It often rains in spring.","春天经常下雨。"],["It sometimes snows in winter.","冬天有时下雪。"]]},
+{n:53,t:"An interesting climate",g:"第三人称单数 -s 变化规则",gb:"动词加 s 的规则：多数直接加 s（rise → rises）；以 s, x, ch, sh, o 结尾加 es（go → goes, watch → watches）；辅音 + y 改 y 为 ies（cry → cries）。",gx:[["The sun rises early in summer.","夏天太阳升得早。"],["Which season do you like best?","你最喜欢哪个季节？"]],w:[["interesting","有趣的"],["subject","话题"],["conversation","谈话"],["mild","温和的"],["always","总是"],["north","北方"],["east","东方"],["wet","潮湿的"],["west","西方"],["south","南方"],["season","季节"],["best","最好地"],["night","夜晚"],["rise","升起"],["early","早"],["set","落下"],["late","晚"]],s:[["Our climate isn't very good, but it's interesting.","我们的气候不算好，但很有意思。"],["The weather is always a subject of conversation.","天气总是聊天的话题。"],["Winter is wet in the south.","南方冬天潮湿。"],["The sun rises early in summer.","夏天太阳升得早。"],["Which season do you like best? I like autumn best.","你最喜欢哪个季节？秋天。"]]},
+{n:55,t:"The Sawyer family",g:"一般现在时描述日常",gb:"日常作息用一般现在时：We usually have lunch at home.  时间介词：in the morning / afternoon / evening，at night。usually 放在实义动词前。",gx:[["What does she do in the morning?","她早上做什么？"],["She usually does the housework.","她通常做家务。"]],w:[["live","居住"],["stay","待在"],["home","家"],["housework","家务"],["lunch","午饭"],["afternoon","下午"],["usually","通常"],["together","一起"],["evening","晚上"],["arrive","到达"],["night","夜间"]],s:[["I usually get up at seven.","我通常七点起床。"],["She does the housework in the morning.","她上午做家务。"],["We usually have lunch together.","我们通常一起吃午饭。"],["The children arrive home in the afternoon.","孩子们下午到家。"],["In the evening, we watch television.","晚上我们看电视。"]]},
+{n:57,t:"An unusual day",g:"一般现在时 vs 现在进行时",gb:"习惯用一般现在时（usually, every day），此刻正在发生用现在进行时（now, today, at the moment）：He usually drinks tea, but today he's drinking coffee.",gx:[["She usually goes by bus.","她通常坐公交。"],["But today she's walking.","但今天她在走路。"]],w:[["o'clock","…点钟"],["shop","商店"],["moment","片刻"],["at the moment","此刻"]],s:[["It's eight o'clock.","现在八点了。"],["The children usually go to school by bus, but today they're walking.","孩子们通常坐公交上学，今天是走路去。"],["At the moment, she's reading a book.","此刻她正在看书。"],["He usually drinks tea, but today he's drinking coffee.","他平时喝茶，今天却在喝咖啡。"],["What time is it? It's ten o'clock.","几点了？十点。"]]},
+{n:59,t:"Is that all?",g:"have 与 some / any",gb:"have 表示「有」，第三人称用 has。肯定句用 some，疑问和否定用 any：Do you have any glue? I don't have any.  购物常用：Is that all? 就这些吗？",gx:[["Do you have any envelopes?","有信封吗？"],["I have some.","有一些。"]],w:[["envelope","信封"],["writing paper","信纸"],["shop assistant","店员"],["size","尺寸"],["pad","便笺本"],["glue","胶水"],["chalk","粉笔"],["change","零钱"]],s:[["I want some envelopes, please.","我想买些信封。"],["Do you want the large size or the small size?","要大号还是小号？"],["Do you have any writing paper?","有信纸吗？"],["I don't have any glue.","我没有胶水。"],["Is that all? Here's your change.","就这些吗？这是找您的零钱。"]]},
+{n:61,t:"A bad cold",g:"have 表示患病；must",gb:"生病用 have：have a cold（感冒）, have a headache（头疼）, have a temperature（发烧）。must 表示必须：You must stay in bed.",gx:[["What's the matter with him?","他怎么了？"],["He has a bad cold.","他得了重感冒。"]],w:[["feel","感觉"],["look","看起来"],["must","必须"],["call","叫"],["doctor","医生"],["telephone","打电话"],["remember","记得"],["mouth","嘴"],["tongue","舌头"],["bad","严重的"],["cold","感冒"],["news","消息"]],s:[["How do you feel today?","你今天感觉怎么样？"],["I feel ill.","我觉得不舒服。"],["He has a bad cold.","他得了重感冒。"],["You must stay in bed.","你必须卧床休息。"],["Open your mouth, please.","请张开嘴。"]]},
+{n:63,t:"Thank you, doctor.",g:"must 与 mustn't",gb:"mustn't = must not，表示「禁止，一定不要」：He mustn't get up yet.  注意 mustn't 不等于「不必」。yet 用在否定句末，意为「还（没）」。",gx:[["Can he get up now?","他现在能起床了吗？"],["No, he mustn't get up yet.","不行，他还不能起来。"]],w:[["better","更好的"],["certainly","当然"],["get up","起床"],["yet","还"],["rich","油腻的"],["food","食物"],["remain","保持"],["quiet","安静的"]],s:[["Is he better now, doctor?","医生，他好些了吗？"],["He mustn't get up yet.","他还不能起床。"],["He must stay in bed for another two days.","他还得再躺两天。"],["He mustn't eat rich food.","他不能吃油腻的东西。"],["You must keep the room quiet.","你们得保持房间安静。"]]},
+{n:65,t:"Not a baby",g:"反身代词 myself / yourself…",gb:"反身代词：myself, yourself, himself, herself, ourselves, yourselves, themselves。Enjoy yourselves! 玩得开心。I can do it myself. 我自己能行。",gx:[["Enjoy yourselves!","玩得开心！"],["I can do it myself.","我自己能做。"]],w:[["key","钥匙"],["baby","婴儿"],["play","玩"],["enjoy","享受"],["myself","我自己"],["yourself","你自己"],["themselves","他们自己"]],s:[["What are you going to do this evening?","你今晚打算做什么？"],["Don't be late.","别回来太晚。"],["Here's the key to the front door.","这是前门的钥匙。"],["Enjoy yourselves!","玩得开心！"],["I'm not a baby. I can do it myself.","我又不是小孩，我自己能行。"]]},
+{n:67,t:"The weekend",g:"一般过去时 was / were",gb:"be 动词过去式：I / he / she / it 用 was，you / we / they 用 were。问：Where were you on Saturday? 答：I was at home.  时间：last weekend, yesterday, on Monday。",gx:[["Where were you last weekend?","你上周末在哪？"],["I was at home.","我在家。"]],w:[["absent","缺席的"],["keep","留在"],["weekend","周末"],["Monday","星期一"],["Saturday","星期六"],["Sunday","星期日"],["greengrocer","蔬菜水果商"],["church","教堂"],["country","乡下"],["lucky","幸运的"]],s:[["Where were you last weekend?","你上周末去哪了？"],["I was at home.","我在家。"],["Were you ill? No, I wasn't.","你病了吗？没有。"],["We were in the country on Saturday.","周六我们在乡下。"],["My son was absent from school yesterday.","我儿子昨天没去上学。"]]},
+{n:69,t:"The car race",g:"There was / There were",gb:"There be 的过去式：单数 There was，复数 There were。There were many people at the race.  过去时间：last year, in 2025。",gx:[["There was a race last year.","去年有一场比赛。"],["There were a lot of people.","人很多。"]],w:[["year","年"],["race","比赛"],["town","城镇"],["crowd","人群"],["stand","站立"],["exciting","令人兴奋的"],["just","正好"],["finish","终点"],["winner","获胜者"],["behind","在…之后"],["way","路途"]],s:[["There is a car race near our town every year.","我们镇附近每年都有赛车。"],["There was a big crowd last year.","去年人特别多。"],["There were many people at the race.","比赛现场有很多人。"],["It was a very exciting race.","那场比赛很精彩。"],["Who was the winner?","谁赢了？"]]},
+{n:71,t:"He's awful!",g:"一般过去时（规则动词 -ed）",gb:"规则动词过去式加 -ed：telephone → telephoned, answer → answered, arrive → arrived。读音三种：/t/ /d/ /ɪd/，跟读时注意别漏掉尾音。",gx:[["He telephoned me yesterday.","他昨天给我打了电话。"],["I answered the phone.","我接了电话。"]],w:[["awful","讨厌的"],["telephone","打电话"],["time","次"],["answer","接（电话）"],["last","上一个的"],["week","星期"]],s:[["He telephoned me three times yesterday.","他昨天给我打了三次电话。"],["I answered the telephone.","我接了电话。"],["He's awful!","他太烦人了！"],["I telephoned you yesterday afternoon.","我昨天下午给你打过电话。"],["He arrived at ten o'clock last night.","他昨晚十点到的。"]]}
+];
+
+/* 美式音标（剑桥词典 US 标注体系） */
+const P={"excuse":"ɪkˈskjuːz","me":"miː","yes":"jes","this":"ðɪs","your":"jʊr","handbag":"ˈhændbæɡ","pardon":"ˈpɑːrdən","it":"ɪt","thank you":"ˈθæŋk juː","very much":"ˈveri mʌtʃ","pen":"pen","pencil":"ˈpensəl","watch":"wɑːtʃ","coat":"koʊt","skirt":"skɝːt","shirt":"ʃɝːt","house":"haʊs",
+"umbrella":"ʌmˈbrelə","please":"pliːz","here":"hɪr","my":"maɪ","ticket":"ˈtɪkɪt","number":"ˈnʌmbɚ","five":"faɪv","sorry":"ˈsɑːri","sir":"sɝː","cloakroom":"ˈkloʊkruːm","suit":"suːt","school":"skuːl","teacher":"ˈtiːtʃɚ","son":"sʌn","daughter":"ˈdɑːt̬ɚ",
+"Mr.":"ˈmɪstɚ","good":"ɡʊd","morning":"ˈmɔːrnɪŋ","Miss":"mɪs","new":"nuː","student":"ˈstuːdənt","French":"frentʃ","German":"ˈdʒɝːmən","nice":"naɪs","meet":"miːt","Japanese":"ˌdʒæpəˈniːz","Korean":"kəˈriːən","Chinese":"tʃaɪˈniːz","too":"tuː","make":"meɪk","English":"ˈɪŋɡlɪʃ","American":"əˈmerɪkən","Italian":"ɪˈtæljən",
+"I":"aɪ","am":"æm","are":"ɑːr","name":"neɪm","what":"wɑːt","nationality":"ˌnæʃəˈnælət̬i","job":"dʒɑːb","engineer":"ˌendʒɪˈnɪr","policeman":"pəˈliːsmən","taxi driver":"ˈtæksi ˌdraɪvɚ","postman":"ˈpoʊstmən","nurse":"nɝːs","mechanic":"məˈkænɪk","hairdresser":"ˈherˌdresɚ","housewife":"ˈhaʊswaɪf",
+"hello":"heˈloʊ","hi":"haɪ","how":"haʊ","today":"təˈdeɪ","well":"wel","fine":"faɪn","thanks":"θæŋks","goodbye":"ɡʊdˈbaɪ","see":"siː","fat":"fæt","thin":"θɪn","tall":"tɑːl","short":"ʃɔːrt","dirty":"ˈdɝːt̬i","clean":"kliːn","hot":"hɑːt","cold":"koʊld","old":"oʊld","young":"jʌŋ","busy":"ˈbɪzi","lazy":"ˈleɪzi",
+"whose":"huːz","blue":"bluː","perhaps":"pɚˈhæps","white":"waɪt","catch":"kætʃ","father":"ˈfɑːðɚ","mother":"ˈmʌðɚ","blouse":"blaʊs","sister":"ˈsɪstɚ","tie":"taɪ","brother":"ˈbrʌðɚ","his":"hɪz","her":"hɝː",
+"colour":"ˈkʌlɚ","green":"ɡriːn","come":"kʌm","upstairs":"ʌpˈsterz","smart":"smɑːrt","hat":"hæt","same":"seɪm","lovely":"ˈlʌvli","case":"keɪs","carpet":"ˈkɑːrpɪt","dog":"dɑːɡ","grey":"ɡreɪ","yellow":"ˈjeloʊ","black":"blæk","orange":"ˈɔːrɪndʒ","red":"red","brown":"braʊn",
+"customs":"ˈkʌstəmz","officer":"ˈɑːfɪsɚ","girl":"ɡɝːl","Danish":"ˈdeɪnɪʃ","friend":"frend","Norwegian":"nɔːrˈwiːdʒən","passport":"ˈpæspɔːrt","tourist":"ˈtʊrɪst",
+"employee":"ɪmˈplɔɪiː","hard-working":"ˌhɑːrdˈwɝːkɪŋ","sales rep":"ˈseɪlz rep","man":"mæn","office":"ˈɑːfɪs","assistant":"əˈsɪstənt","woman":"ˈwʊmən",
+"matter":"ˈmæt̬ɚ","children":"ˈtʃɪldrən","tired":"taɪrd","boy":"bɔɪ","thirsty":"ˈθɝːsti","mum":"mʌm","sit down":"sɪt ˈdaʊn","right":"raɪt","ice cream":"ˈaɪs kriːm","big":"bɪɡ","small":"smɑːl","open":"ˈoʊpən","shut":"ʃʌt","light":"laɪt","heavy":"ˈhevi","long":"lɑːŋ","shoe":"ʃuː",
+"give":"ɡɪv","one":"wʌn","which":"wɪtʃ","empty":"ˈempti","full":"fʊl","large":"lɑːrdʒ","little":"ˈlɪt̬əl","sharp":"ʃɑːrp","blunt":"blʌnt","box":"bɑːks","glass":"ɡlæs","cup":"kʌp","bottle":"ˈbɑːt̬əl","tin":"tɪn","knife":"naɪf","fork":"fɔːrk",
+"on":"ɑːn","shelf":"ʃelf","desk":"desk","table":"ˈteɪbəl","plate":"pleɪt","cupboard":"ˈkʌbɚd","television":"ˈteləvɪʒən","floor":"flɔːr","dressing table":"ˈdresɪŋ ˌteɪbəl","magazine":"ˈmæɡəziːn","bed":"bed","newspaper":"ˈnuːzˌpeɪpɚ",
+"Mrs":"ˈmɪsɪz","kitchen":"ˈkɪtʃən","refrigerator":"rɪˈfrɪdʒəreɪt̬ɚ","electric":"iˈlektrɪk","left":"left","cooker":"ˈkʊkɚ","middle":"ˈmɪdəl","of":"əv","room":"ruːm","where":"wer",
+"living room":"ˈlɪvɪŋ ruːm","near":"nɪr","window":"ˈwɪndoʊ","armchair":"ˈɑːrmtʃer","door":"dɔːr","picture":"ˈpɪktʃɚ","wall":"wɑːl",
+"bedroom":"ˈbedruːm","untidy":"ʌnˈtaɪdi","must":"mʌst","air":"er","put":"pʊt","clothes":"kloʊðz","wardrobe":"ˈwɔːrdroʊb","dust":"dʌst","sweep":"swiːp","read":"riːd","throw":"θroʊ","turn on":"tɝːn ˈɑːn","turn off":"tɝːn ˈɑːf",
+"garden":"ˈɡɑːrdən","under":"ˈʌndɚ","tree":"triː","climb":"klaɪm","who":"huː","run":"rʌn","grass":"ɡræs","after":"ˈæftɚ","across":"əˈkrɑːs","cat":"kæt","eat":"iːt","type":"taɪp","wash":"wɑːʃ","cook":"kʊk","cry":"kraɪ","wait":"weɪt","jump":"dʒʌmp",
+"day":"deɪ","cloud":"klaʊd","shine":"ʃaɪn","sun":"sʌn","with":"wɪð","family":"ˈfæməli","walk":"wɑːk","over":"ˈoʊvɚ","bridge":"brɪdʒ","boat":"boʊt","river":"ˈrɪvɚ","ship":"ʃɪp","aeroplane":"ˈerəpleɪn","sky":"skaɪ",
+"photograph":"ˈfoʊt̬əɡræf","village":"ˈvɪlɪdʒ","valley":"ˈvæli","between":"bɪˈtwiːn","hill":"hɪl","another":"əˈnʌðɚ","wife":"waɪf","along":"əˈlɑːŋ","bank":"bæŋk","water":"ˈwɑːt̬ɚ","swim":"swɪm","building":"ˈbɪldɪŋ","park":"pɑːrk","into":"ˈɪntuː","beside":"bɪˈsaɪd","off":"ɑːf",
+"work":"wɝːk","hard":"hɑːrd","bookcase":"ˈbʊkkeɪs","going to":"ˈɡoʊɪŋ tuː","paint":"peɪnt","pink":"pɪŋk","favourite":"ˈfeɪvərɪt","homework":"ˈhoʊmwɝːk","listen":"ˈlɪsən","dish":"dɪʃ",
+"front":"frʌnt","in front of":"ɪn ˈfrʌnt əv","careful":"ˈkerfəl","vase":"veɪs","drop":"drɑːp","flower":"ˈflaʊɚ","show":"ʃoʊ","send":"send","take":"teɪk",
+"cheese":"tʃiːz","bread":"bred","soap":"soʊp","chocolate":"ˈtʃɑːklət","sugar":"ˈʃʊɡɚ","coffee":"ˈkɑːfi","tea":"tiː","tobacco":"təˈbækoʊ","a bar of":"ə ˈbɑːr əv","a loaf of":"ə ˈloʊf əv","a pound of":"ə ˈpaʊnd əv",
+"can":"kæn","of course":"əv ˈkɔːrs","now":"naʊ","find":"faɪnd","kettle":"ˈket̬əl","behind":"bɪˈhaɪnd","teapot":"ˈtiːpɑːt","boil":"bɔɪl",
+"boss":"bɑːs","minute":"ˈmɪnɪt","ask":"æsk","handwriting":"ˈhændˌraɪt̬ɪŋ","terrible":"ˈterəbəl","lift":"lɪft",
+"like":"laɪk","want":"wɑːnt","fresh":"freʃ","egg":"eɡ","butter":"ˈbʌt̬ɚ","pure":"pjʊr","honey":"ˈhʌni","ripe":"raɪp","banana":"bəˈnænə","jam":"dʒæm","sweet":"swiːt","wine":"waɪn","beer":"bɪr",
+"butcher":"ˈbʊtʃɚ","meat":"miːt","beef":"biːf","lamb":"læm","husband":"ˈhʌzbənd","steak":"steɪk","mince":"mɪns","chicken":"ˈtʃɪkɪn","tell":"tel","truth":"truːθ","either":"ˈiːðɚ","tomato":"təˈmeɪt̬oʊ","potato":"pəˈteɪt̬oʊ","cabbage":"ˈkæbɪdʒ","pear":"per","grape":"ɡreɪp","peach":"piːtʃ",
+"Greece":"ɡriːs","climate":"ˈklaɪmət","country":"ˈkʌntri","pleasant":"ˈplezənt","weather":"ˈweðɚ","spring":"sprɪŋ","windy":"ˈwɪndi","warm":"wɔːrm","rain":"reɪn","sometimes":"ˈsʌmtaɪmz","summer":"ˈsʌmɚ","autumn":"ˈɑːt̬əm","winter":"ˈwɪnt̬ɚ","snow":"snoʊ","January":"ˈdʒænjueri","April":"ˈeɪprəl","July":"dʒʊˈlaɪ","October":"ɑːkˈtoʊbɚ",
+"interesting":"ˈɪntrəstɪŋ","subject":"ˈsʌbdʒekt","conversation":"ˌkɑːnvɚˈseɪʃən","mild":"maɪld","always":"ˈɑːlweɪz","north":"nɔːrθ","east":"iːst","wet":"wet","west":"west","south":"saʊθ","season":"ˈsiːzən","best":"best","night":"naɪt","rise":"raɪz","early":"ˈɝːli","set":"set","late":"leɪt",
+"live":"lɪv","stay":"steɪ","home":"hoʊm","housework":"ˈhaʊswɝːk","lunch":"lʌntʃ","afternoon":"ˌæftɚˈnuːn","usually":"ˈjuːʒuəli","together":"təˈɡeðɚ","evening":"ˈiːvnɪŋ","arrive":"əˈraɪv",
+"o'clock":"əˈklɑːk","shop":"ʃɑːp","moment":"ˈmoʊmənt","at the moment":"æt ðə ˈmoʊmənt",
+"envelope":"ˈenvəloʊp","writing paper":"ˈraɪt̬ɪŋ ˌpeɪpɚ","shop assistant":"ˈʃɑːp əˌsɪstənt","size":"saɪz","pad":"pæd","glue":"ɡluː","chalk":"tʃɑːk","change":"tʃeɪndʒ",
+"feel":"fiːl","look":"lʊk","call":"kɑːl","doctor":"ˈdɑːktɚ","telephone":"ˈteləfoʊn","remember":"rɪˈmembɚ","mouth":"maʊθ","tongue":"tʌŋ","bad":"bæd","news":"nuːz",
+"better":"ˈbet̬ɚ","certainly":"ˈsɝːtənli","get up":"ɡet ˈʌp","yet":"jet","rich":"rɪtʃ","food":"fuːd","remain":"rɪˈmeɪn","quiet":"ˈkwaɪət",
+"key":"kiː","baby":"ˈbeɪbi","play":"pleɪ","enjoy":"ɪnˈdʒɔɪ","myself":"maɪˈself","yourself":"jʊrˈself","themselves":"ðəmˈselvz",
+"absent":"ˈæbsənt","keep":"kiːp","weekend":"ˈwiːkend","Monday":"ˈmʌndeɪ","Saturday":"ˈsæt̬ɚdeɪ","Sunday":"ˈsʌndeɪ","greengrocer":"ˈɡriːnˌɡroʊsɚ","church":"tʃɝːtʃ","lucky":"ˈlʌki",
+"year":"jɪr","race":"reɪs","town":"taʊn","crowd":"kraʊd","stand":"stænd","exciting":"ɪkˈsaɪt̬ɪŋ","just":"dʒʌst","finish":"ˈfɪnɪʃ","winner":"ˈwɪnɚ","way":"weɪ",
+"awful":"ˈɑːfəl","time":"taɪm","answer":"ˈænsɚ","last":"læst","week":"wiːk"};
+/* 教材是英式拼写/用词，这里标出美国人常用的说法 */
+const US={"aeroplane":"airplane","mum":"mom","colour":"color","grey":"gray","favourite":"favorite","cloakroom":"coatroom","postman":"mailman","cooker":"stove","wardrobe":"closet","tin":"can","autumn":"fall","shop":"store","shop assistant":"salesclerk","mince":"ground meat","sales rep":"sales rep","greengrocer":"produce store"};
+delete US["sales rep"];
+
+/* 音标表：[音标, 类别, 口型提示, [[例词, 高亮字母]]] */
+const PH=[
+["iː","长元音","嘴角向两边拉开，像微笑，声音拉长。",[["see","ee"],["tea","ea"],["meet","ee"]]],
+["ɪ","短元音","比 iː 短、放松，嘴巴略开。不要读成拉长的「衣」。",[["sit","i"],["big","i"],["busy","u"]]],
+["i","弱读元音","出现在不重读的词尾，像短而轻的 iː，嘴角微微拉开。",[["happy","y"],["very","y"],["coffee","ee"]]],
+["e","短元音","嘴巴半开，舌尖抵住下齿。",[["bed","e"],["red","e"],["friend","ie"]]],
+["æ","短元音","嘴张大，嘴角往两边拉。美音里这个音很饱满，介于「啊」和「哎」之间。",[["cat","a"],["bag","a"],["black","a"]]],
+["ɑː","长元音","嘴张大放松，舌头平放靠后。美音里 hot、job、dog 都读这个音。",[["father","a"],["hot","o"],["job","o"]]],
+["ɔː","长元音","嘴唇略圆。美音里多出现在 r 前面。",[["story","o"],["morning","o"],["orange","o"]]],
+["ʊ","短元音","嘴唇稍圆，短促放松。",[["book","oo"],["good","oo"],["put","u"]]],
+["uː","长元音","嘴唇圆而向前突出，声音拉长。",[["too","oo"],["blue","ue"],["school","oo"]]],
+["u","弱读元音","不重读的 u，像短而轻的 uː，嘴唇微圆。",[["usually","u"],["January","u"],["influence","u"]]],
+["ʌ","短元音","嘴半开，短促有力，像轻轻的「啊」。",[["cup","u"],["son","o"],["mother","o"]]],
+["ə","弱读元音","最轻最短的音，只出现在不重读的音节里，一带而过。",[["about","a"],["banana","a"],["today","o"]]],
+["ɚ","弱读卷舌","发 ə 的同时舌尖向上卷。这是美音最明显的特征之一。",[["teacher","er"],["mother","er"],["doctor","or"]]],
+["ɝː","重读卷舌","重读的卷舌长音，舌尖卷起但不碰上颚。",[["bird","ir"],["nurse","ur"],["work","or"]]],
+["eɪ","双元音","从 e 平滑地滑向 ɪ，前重后轻。",[["day","ay"],["name","a"],["cake","a"]]],
+["aɪ","双元音","从 a 滑向 ɪ，嘴巴由大到小。",[["my","y"],["five","i"],["nice","i"]]],
+["ɔɪ","双元音","从 ɔ 滑向 ɪ。",[["boy","oy"],["boil","oi"],["enjoy","oy"]]],
+["oʊ","双元音","美音的「欧」，从 o 滑向 ʊ，嘴唇逐渐收圆。",[["go","o"],["coat","oa"],["home","o"]]],
+["aʊ","双元音","从 a 滑向 ʊ，嘴巴由大到圆。",[["now","ow"],["house","ou"],["brown","ow"]]],
+["ɪr","卷舌组合","先发 ɪ，再卷起舌尖。",[["here","ere"],["near","ear"],["beer","eer"]]],
+["er","卷舌组合","先发 e，再卷起舌尖。",[["hair","air"],["where","ere"],["pear","ear"]]],
+["ɑːr","卷舌组合","先发 ɑː，再卷起舌尖。",[["car","ar"],["park","ar"],["large","ar"]]],
+["ɔːr","卷舌组合","嘴唇稍圆发 ɔː，再卷起舌尖。",[["door","oor"],["short","or"],["four","our"]]],
+["ʊr","卷舌组合","先发 ʊ，再卷起舌尖。",[["tour","our"],["pure","ure"],["your","our"]]],
+["p","清辅音","双唇闭合后爆破，有明显气流。",[["pen","p"],["paint","p"],["cup","p"]]],
+["b","浊辅音","口型同 p，声带振动。",[["book","b"],["boy","b"],["job","b"]]],
+["t","清辅音","舌尖抵上齿龈后爆破。",[["tea","t"],["ticket","t"],["hat","t"]]],
+["d","浊辅音","口型同 t，声带振动。",[["dog","d"],["door","d"],["bed","d"]]],
+["t̬","美式闪音","t 夹在两个元音之间时，舌尖快速轻弹一下，听起来像轻的 d。",[["water","t"],["better","tt"],["little","tt"]]],
+["k","清辅音","舌根抵住软腭后爆破。",[["cat","c"],["key","k"],["book","k"]]],
+["ɡ","浊辅音","口型同 k，声带振动。",[["good","g"],["girl","g"],["big","g"]]],
+["f","清辅音","上齿轻触下唇，气流摩擦。",[["five","f"],["fine","f"],["coffee","ff"]]],
+["v","浊辅音","口型同 f，声带振动。上齿要碰下唇，不要读成 w。",[["very","v"],["give","v"],["have","v"]]],
+["θ","清辅音","舌尖放在上下齿之间，送气。不要读成 s。",[["thank","th"],["thin","th"],["mouth","th"]]],
+["ð","浊辅音","口型同 θ，声带振动。不要读成 z 或 d。",[["this","th"],["mother","th"],["with","th"]]],
+["s","清辅音","舌尖靠近上齿龈，气流摩擦。",[["see","s"],["sit","s"],["bus","s"]]],
+["z","浊辅音","口型同 s，声带振动，像蜜蜂嗡嗡声。",[["zoo","z"],["busy","s"],["his","s"]]],
+["ʃ","清辅音","双唇略向前突出，像「嘘」。",[["she","sh"],["shirt","sh"],["fish","sh"]]],
+["ʒ","浊辅音","口型同 ʃ，声带振动。",[["usually","s"],["television","s"],["measure","s"]]],
+["h","清辅音","轻轻呼气。不要读成喉咙很重的「喝」。",[["hat","h"],["house","h"],["who","wh"]]],
+["tʃ","清辅音","像「吃」，但嘴唇要向前突出。",[["chair","ch"],["teacher","ch"],["watch","tch"]]],
+["dʒ","浊辅音","像「之」，但嘴唇要向前突出。",[["job","j"],["orange","g"],["bridge","dge"]]],
+["m","鼻音","双唇闭合，气流从鼻腔出来。",[["me","m"],["name","m"],["mum","m"]]],
+["n","鼻音","舌尖抵住上齿龈，气流从鼻腔出来。",[["no","n"],["nice","n"],["pen","n"]]],
+["ŋ","鼻音","舌根抵住软腭，像「嗯」的鼻音。词尾的 g 不要另外读出来。",[["sing","ng"],["long","ng"],["morning","ng"]]],
+["l","舌侧音","在词首时舌尖抵住上齿龈；在词尾是「暗 l」，舌后部抬起，像轻轻的「哦」。",[["like","l"],["light","l"],["well","ll"]]],
+["r","卷舌音","舌尖卷起但不碰上颚，嘴唇略圆。",[["red","r"],["right","r"],["very","r"]]],
+["w","半元音","嘴唇先收圆，再迅速放开。",[["we","w"],["window","w"],["one","o"]]],
+["j","半元音","舌面抬高，像「耶」的开头。注意 j 在音标里读「耶」，不是字母 j。",[["yes","y"],["you","y"],["yellow","y"]]]
+];
+const PHG=[["单元音",0,14],["双元音",14,19],["卷舌元音",19,24],["辅音",24,PH.length]];
+const PHM={}; PH.forEach(p=>PHM[p[0]]=p);
+const RCOMBO=["ɑːr","ɔːr","ɪr","er","ʊr"], VOW="iɪeæɑɔʊuʌəɚɝaoː";
+const SYMS=PH.map(p=>p[0]).sort((a,b)=>b.length-a.length);
+function ipaTokens(s){
+  const out=[]; let i=0; s=s.replace(/[ˈˌ\s]/g,"");
+  while(i<s.length){
+    let hit=null;
+    for(const sym of SYMS){
+      if(s.startsWith(sym,i)){
+        if(RCOMBO.includes(sym)&&i+sym.length<s.length&&VOW.includes(s[i+sym.length])) continue;
+        hit=sym;break;}
+    }
+    if(!hit){i++;continue}
+    out.push(hit); i+=hit.length;
+  }
+  return out;
+}
+
+/* 语法：要点（句型 + 易错）+ 拓展 + 小测 */
+const G={
+1:{p:[{h:"一般疑问句 Is this…?",b:"陈述句里的 is 提到句首，就变成疑问句，句尾用升调。",f:[["陈述","This is your pen."],["疑问","Is this your pen?"],["肯定回答","Yes, it is."],["否定回答","No, it isn't."],["否定句","This is not my pen."]],e:[["Yes, it's.","Yes, it is.","肯定简答的句尾不能缩写。"],["Is this you pen?","Is this your pen?","you 是「你」，your 是「你的」。"],["This is my.","This is my pen.","my 后面必须跟名词。"]]},
+{h:"三句礼貌用语",b:"Excuse me 用在打扰别人之前；Pardon? 用在没听清时，要用升调；Sorry 用在做错事之后。",f:[["引起注意","Excuse me."],["没听清","Pardon?"],["道歉","I'm sorry."]],e:[["Sorry, where's the bus stop?","Excuse me, where's the bus stop?","问路是打扰别人，不是道歉。"]]}],
+x:[["美国人没听清时更常说 Sorry? 或 Excuse me?，也用升调。","Sorry?"],["Thank you very much. 的常见回答：","You're welcome."]],
+q:[["___ this your coat?","Is"],["Yes, it ___.","is"],["No, it ___.","isn't"],["This ___ my umbrella.（否定）","isn't / is not"]]},
+3:{p:[{h:"物主代词 my / your",b:"my（我的）、your（你的）放在名词前，名词前就不再加 a 或 the。",f:[["我的","This is my ticket."],["你的","Is this your umbrella?"]],e:[["This is a my coat.","This is my coat.","物主代词和 a / the 不能同时用。"]]},
+{h:"递东西与提请求",b:"递给别人东西用 Here is…，口语缩成 Here's。请求时只说名词加 please 就够了，很自然。",f:[["请求","My coat, please."],["递给","Here's your coat."],["号码","Number five."]],e:[["Here your ticket.","Here is your ticket.","Here 后面不能少了 is。"],["The number five.","Number five.","说号码时 number 前不加 the。"]]}],
+x:[["美国人递东西更常说：","Here you go."],["英语说号码，0 常读作字母 o：","My number is five oh two."]],
+q:[["___ is your ticket.","Here"],["My umbrella, ___.","please"],["This is ___ coat.（我的）","my"]]},
+5:{p:[{h:"介绍他人",b:"介绍别人用 This is…，不用 He is…。被介绍的双方都说 Nice to meet you.，回答可以说 Nice to meet you, too.",f:[["介绍","This is Miss Li."],["回应","Nice to meet you."],["回答","Nice to meet you, too."]],e:[["He is Mr. Wang.（介绍时）","This is Mr. Wang.","当面介绍某人时用 This is。"]]},
+{h:"国籍：国家名与形容词",b:"说某人是哪国人，用 be + 国籍形容词。China → Chinese，Japan → Japanese，France → French，Germany → German，Korea → Korean，Italy → Italian，America → American。",f:[["他是中国人","He is Chinese."],["她是法国人","She is French."],["什么牌子","What make is it?"],["回答","It's a German car."]],e:[["He is China.","He is Chinese.","China 是国家名，说人要用形容词。"],["She is a French.","She is French.","French、Chinese 这类词作形容词时，前面不加 a。"],["It's a Italian car.","It's an Italian car.","元音音素开头的词前用 an。"]]}],
+x:[["问国籍更自然的说法是问来自哪里：","Where are you from?"],["回答：","I'm from Hangzhou, China."]],
+q:[["He's from China. He's ___.","Chinese"],["She's from Japan. She's ___.","Japanese"],["It's ___ Italian car.","an"],["What ___ is it? It's a Volvo.","make"]]},
+7:{p:[{h:"be 动词全表",b:"I 配 am；you、we、they 配 are；he、she、it 配 is。否定加 not，疑问把 be 提到前面。",f:[["我是","I'm a nurse."],["我不是","I'm not a teacher."],["你是吗","Are you a teacher?"],["他不是","He isn't an engineer."],["他们是","They're students."]],e:[["I amn't a teacher.","I'm not a teacher.","am not 没有 amn't 这种缩写。"],["I'm teacher.","I'm a teacher.","说职业时，单数名词前要加 a / an。"]]},
+{h:"特殊疑问句 What…?",b:"疑问词 + be + 主语。What's = What is。",f:[["名字","What's your name?"],["国籍","What nationality are you?"],["职业","What's your job?"]],e:[["What your job is?","What's your job?","疑问句里 be 要放到主语前面。"]]},
+{h:"a 还是 an：看读音，不看字母",b:"第一个音是元音就用 an，是辅音就用 a。所以是 an hour（h 不发音），a university（u 读 /juː/）。",f:[["an","He's an engineer."],["an","Wait an hour."],["a","It's a university."]],e:[["an university","a university","university 的第一个音是 /j/，是辅音。"],["a hour","an hour","hour 的 h 不发音。"]]}],
+x:[["美国人问职业常说：","What do you do?"],["回答：","I run a small hotel."]],
+q:[["I ___ a nurse.","am"],["___ you a teacher?","Are"],["He's ___ engineer.","an"],["She's ___ university student.","a"]]},
+9:{p:[{h:"How 问候",b:"How are you? 问身体和近况，回答 I'm fine / very well, thank you. And you?  How do you do? 只用于正式场合初次见面。",f:[["问候","How are you today?"],["回答","I'm fine, thank you. And you?"],["问别人","How is your wife?"],["回答","She's very well."]],e:[["How are you? 回答 I'm fine, thank you, and you?（背书式）","Good, thanks. You?","这样答没错，只是太像课本。日常可以说得更随意。"]]},
+{h:"形容词作表语",b:"主语 + be + 形容词。中文说「他很忙」，句子里没有「是」，但英语一定要有 be。",f:[["肯定","He is very busy."],["否定","He isn't lazy."],["疑问","Is she tired?"],["回答","Yes, she is."]],e:[["He very busy.","He is very busy.","中国人最常见的错误之一：形容词前漏掉 be。"],["She is very tiredly.","She is very tired.","be 后面接形容词，不接副词。"]]}],
+x:[["美国人常用的回答：","I'm good, thanks. How about you?"],["Fine 单独说可能显得有点冷淡，加上 thanks 就好了。","Fine, thanks."]],
+q:[["How ___ you today?","are"],["How ___ Emma?","is"],["She ___ very busy.","is"],["Is he lazy? No, he ___.","isn't"]]},
+11:{p:[{h:"Whose 疑问句",b:"问「谁的」：Whose is this? 或 Whose + 名词 + is this?  回答用名词所有格。",f:[["问","Whose shirt is this?"],["答","It's Tim's."],["完整","It's Tim's shirt."]],e:[["Who's shirt is this?","Whose shirt is this?","Who's = Who is，读音一样，意思不同。"]]},
+{h:"名词所有格 's",b:"单数名词加 's：Tim's, my father's。以 s 结尾的复数只加 '：the students'。不以 s 结尾的复数加 's：children's。",f:[["单数","It's my father's car."],["复数","the students' books"],["不规则复数","the children's room"]],e:[["the shirt of Tim","Tim's shirt","表示人的所属，用 's。"]]},
+{h:"物主代词 his / her",b:"my 我的，your 你的，his 他的，her 她的，its 它的，our 我们的，their 他们的。",f:[["他的","It's his tie."],["她的","Is this her bag?"]],e:[["He's tie","His tie","He's = He is。"],["It's she bag.","It's her bag.","she 是主语，「她的」是 her。"]]}],
+x:[["口语里扔东西给别人前会说：","Here, catch!"],["问「这是谁的」的另一种说法：","Who does this belong to?"]],
+q:[["___ is this? It's my sister's.","Whose"],["It's ___ tie.（他的）","his"],["This is my ___ car.（爸爸的）","father's"],["Is this ___ bag?（她的）","her"]]},
+13:{p:[{h:"What colour…?",b:"问颜色用 What colour is…? 回答直接说颜色。颜色作形容词时，前面不加 a。",f:[["问","What colour is your car?"],["答","It's grey."],["复数","What colour are your shoes?"]],e:[["It's a green.","It's green.","颜色作表语时是形容词，不加冠词。"]]},
+{h:"形容词的两个位置",b:"放在名词前：a new dress。放在 be 后：The dress is new。冠词跟着第一个词的读音走：a new dress，an old dress。",f:[["名词前","It's a lovely hat."],["be 后","The hat is lovely."],["相同","My hat is the same colour."]],e:[["a dress new","a new dress","形容词放在名词前面。"],["same colour","the same colour","same 前面总要加 the。"]]}],
+x:[["美式拼写是 color，读音相同。","What color is it?"],["美国人夸东西好看常说：","That looks great on you."]],
+q:[["What ___ is your coat?","colour / color"],["It's ___ old hat.","an"],["My hat is ___ same colour.","the"],["Is it a green? 哪里错了？","It's green.（不加 a）"]]},
+15:{p:[{h:"名词复数规则",b:"一般加 s；以 s、x、ch、sh 结尾加 es；以 f / fe 结尾多数改成 ves。",f:[["加 s","two passports"],["加 es","three boxes"],["加 es","two watches"],["改 ves","two knives"]],e:[["two passport","two passports","数量大于一，名词要变复数。"],["boxs","boxes","以 x 结尾加 es。"]]},
+{h:"单数句变复数句",b:"整句一起变：this → these，that → those，it → they，is → are，名词变复数。",f:[["单数","This is my case."],["复数","These are my cases."],["疑问","Are you tourists?"],["回答","Yes, we are."]],e:[["These is my friends.","These are my friends.","复数主语配 are。"],["They are tourist.","They are tourists.","主语是复数，后面的名词也要用复数。"]]}],
+x:[["海关常问的问题：","What's the purpose of your visit?"],["回答：","I'm here on vacation."]],
+q:[["This is my book. → These ___ my ___.","are, books"],["___ you French?","Are"],["box → ?","boxes"],["knife → ?","knives"]]},
+17:{p:[{h:"Who 问人，What 问职业",b:"Who is she? 问她是谁（身份、关系）。What's her job? 或 What does she do? 问她做什么工作。",f:[["问人","Who is that man?"],["答","He's my boss."],["问职业","What are their jobs?"],["答","They're sales reps."]],e:[["Who is she? She's a nurse.","What's her job? She's a nurse.","Who 问关系，问职业用 What。"]]},
+{h:"不规则复数",b:"这几个要单独记：man → men，woman → women，child → children，person → people，foot → feet，tooth → teeth。",f:[["男人们","These men are engineers."],["女人们","Those women are nurses."],["孩子们","The children are tired."]],e:[["mans","men","不规则复数不加 s。"],["childrens","children","children 已经是复数。"]]}],
+x:[["How do you do? 很正式，现在美国人见面多说：","Nice to meet you."],["夸别人工作努力：","You're a hard worker."]],
+q:[["one woman → two ___","women"],["___ is that man? He's my boss.","Who"],["What are ___ jobs?（他们的）","their"],["one child → three ___","children"]]},
+19:{p:[{h:"What's the matter?",b:"问对方怎么了：What's the matter? 回答描述自己的状态：I'm tired.  问别人：What's the matter with him?",f:[["问","What's the matter?"],["答","I'm tired and thirsty."],["问他人","What's the matter with him?"]],e:[["What's matter?","What's the matter?","the 不能省。"]]},
+{h:"反义形容词成对记",b:"big / small，open / shut，light / heavy，long / short，clean / dirty，hot / cold，old / young（或 new）。",f:[["轻重","This box isn't light. It's heavy."],["开关","The door isn't open. It's shut."]],e:[["These shoe are big.","These shoes are big.","shoes 一般成对出现，用复数。"]]}],
+x:[["美国人更常说：","What's wrong?"],["关心别人：","Are you okay?"],["美国人叫妈妈是 mom。","Thanks, Mom."]],
+q:[["What's ___ matter?","the"],["The box isn't light. It's ___.","heavy"],["The door isn't open. It's ___.","shut"],["These ___ are heavy.（鞋）","shoes"]]},
+21:{p:[{h:"主格与宾格",b:"主格作主语，宾格放在动词或介词后。I → me，he → him，she → her，we → us，they → them；you 和 it 不变。",f:[["给我","Give me a book."],["给他","Give him the pen."],["给他们","Give them the keys."]],e:[["Give I a cup.","Give me a cup.","动词后面用宾格。"],["Give she the book.","Give her the book.","she 只能作主语。"]]},
+{h:"双宾语：give sb sth = give sth to sb",b:"东西是代词 it / them 时，用 give it to me 这个结构更稳妥。",f:[["人在前","Give me the book."],["物在前","Give the book to me."],["代词","Give it to me."]],e:[["Give it me.","Give it to me.","美式英语里要加 to。"]]},
+{h:"Which one? 哪一个",b:"回答用 this one、the red one、the large one。复数用 which ones / the red ones。",f:[["问","Which one?"],["答","The large one."],["复数","Which ones? The red ones."]],e:[["The large.","The large one.","形容词后面要用 one 代替名词。"]]}],
+x:[["递东西时美国人常说：","Here you go."],["请别人递给你：","Can you pass me the salt?"]],
+q:[["Give ___ a pen.（我）","me"],["Give it to ___.（她）","her"],["Which ___? The red one.","one"],["Give ___ the keys.（他们）","them"]]},
+23:{p:[{h:"介词短语放在名词后面",b:"中文说「架子上的杯子」，英语说 the glasses on the shelf，顺序相反。",f:[["单数","the book on the desk"],["复数","the glasses on the shelf"],["请求","Give me the cups on the table."]],e:[["the on the shelf glasses","the glasses on the shelf","介词短语放在名词后面。"]]},
+{h:"the one / the ones",b:"代替前面说过的名词，避免重复。单数用 one，复数用 ones。",f:[["单数","Which knife? The one on the table."],["复数","Which plates? The ones in the cupboard."]],e:[["Which glasses? The one on the shelf.","The ones on the shelf.","glasses 是复数。"]]}],
+x:[["on 在表面，in 在里面，under 在下面：","The cups are in the cupboard."],["美国人说 cupboard 时 p 不发音。","cupboard"]],
+q:[["Give me the cups ___ the shelf.","on"],["Which knife? The ___ on the table.","one"],["Which plates? The ___ in the cupboard.","ones"]]},
+25:{p:[{h:"There is… 某处有某物",b:"There is + 单数或不可数名词 + 地点。疑问把 is 提前，回答用 there is / there isn't。",f:[["肯定","There's a cooker in the kitchen."],["疑问","Is there a cup on the table?"],["回答","Yes, there is."],["否定","There isn't a table in the room."]],e:[["There have a table in the kitchen.","There is a table in the kitchen.","中国人的头号错误：表示「某处有」用 there is，不用 have。"]]},
+{h:"Where is…? 与方位",b:"on the left 在左边，on the right 在右边，in the middle of 在中间。",f:[["问","Where's the cooker?"],["答","It's on the right."],["中间","It's in the middle of the room."]],e:[["on left","on the left","left / right 前要加 the。"]]},
+{h:"a 和 the",b:"第一次提到用 a，再次提到同一个东西用 the。",f:[["第一次","There's a cup on the table."],["再提","The cup is clean."]],e:[["There is the cup on the table.（第一次提）","There is a cup on the table.","there is 句型里通常用 a。"]]}],
+x:[["美国人说厨房里的炉子是 stove。","The stove is on the right."],["冰箱口语常说 fridge。","The milk is in the fridge."]],
+q:[["___ a refrigerator in the kitchen.","There's"],["___ there a cup? Yes, there ___.","Is, is"],["The cooker is ___ the right.","on"],["There is a cup. ___ cup is blue.","The"]]},
+27:{p:[{h:"There are + 复数",b:"复数名词用 There are。并列时看离 be 最近的那个名词：There is a book and two pens. / There are two pens and a book.",f:[["肯定","There are some books on the shelf."],["疑问","Are there any pictures on the wall?"],["回答","Yes, there are."],["否定","There aren't any magazines."]],e:[["There is some books.","There are some books.","复数用 are。"]]},
+{h:"some 与 any",b:"肯定句用 some，疑问句和否定句一般用 any。",f:[["肯定","There are some cups."],["疑问","Are there any cups?"],["否定","There aren't any cups."]],e:[["Are there some pictures?","Are there any pictures?","一般疑问句用 any。"],["There aren't some books.","There aren't any books.","否定句用 any。"]]}],
+x:[["请别人时用 some，表示希望对方接受：","Would you like some tea?"],["美国人说客厅也常说 family room。",""]],
+q:[["There ___ some books on the shelf.","are"],["Are there ___ pictures?","any"],["There aren't ___ magazines.","any"],["There ___ a book and two pens.","is"]]},
+29:{p:[{h:"祈使句",b:"动词原形开头，没有主语。否定在前面加 Don't。加 please 更礼貌。",f:[["肯定","Open the window."],["礼貌","Shut the door, please."],["否定","Don't open it."]],e:[["Opens the window.","Open the window.","祈使句用动词原形。"]]},
+{h:"must + 动词原形",b:"must 表示必须，后面接动词原形；主语是 he / she 也不变。",f:[["必须","You must open the window."],["他","He must make the bed."]],e:[["You must to open the window.","You must open the window.","must 后面不加 to。"],["He musts…","He must…","must 没有第三人称变化。"]]},
+{h:"turn on / turn off",b:"宾语是名词时可放中间或后面；宾语是代词 it / them 时，只能放在中间。",f:[["名词","Turn off the light."],["名词","Turn the light off."],["代词","Turn it off."]],e:[["Turn off it.","Turn it off.","代词必须放在动词和副词中间。"]]}],
+x:[["美国人叫衣柜 closet。","Put your clothes in the closet."],["比 must 更常用的说法：","You need to clean your room."]],
+q:[["___ the door, please.","Shut"],["You must ___ your clothes away.（put）","put"],["Turn ___ off.（灯→它）","it"],["___ open the window!（别）","Don't"]]},
+31:{p:[{h:"现在进行时",b:"am / is / are + 动词-ing，表示此刻正在做的事。",f:[["肯定","She is sitting under the tree."],["否定","She isn't running."],["疑问","Is the dog running?"],["回答","Yes, it is."],["特殊疑问","What is she doing?"]],e:[["She sitting under the tree.","She is sitting under the tree.","不能漏掉 be。"],["What she is doing?","What is she doing?","疑问句把 be 放到主语前面。"]]},
+{h:"-ing 的拼写规则",b:"一般直接加 ing；以不发音的 e 结尾，去 e 加 ing；重读闭音节结尾只有一个辅音字母，双写再加 ing；ie 结尾改成 y 加 ing。",f:[["直接加","eat → eating"],["去 e","make → making"],["双写","run → running"],["ie 改 y","lie → lying"]],e:[["runing","running","重读闭音节要双写。"],["makeing","making","去掉不发音的 e。"]]},
+{h:"Who 作主语",b:"Who 作主语时，后面的动词按单数处理。",f:[["问","Who is climbing the tree?"],["答","Tim is."]],e:[["Who are climbing the tree?","Who is climbing the tree?","Who 作主语时动词用单数。"]]}],
+x:[["打电话时常用进行时：","What are you doing right now?"],["回答：","I'm cooking dinner."]],
+q:[["She ___ under the tree.（sit）","is sitting"],["The dog ___.（run）","is running"],["What ___ he doing?","is"],["make → ?","making"]]},
+33:{p:[{h:"复数主语的进行时",b:"they / we / 复数名词 + are + -ing。",f:[["肯定","The children are swimming."],["疑问","Are they walking?"],["回答","Yes, they are."]],e:[["The children is swimming.","The children are swimming.","children 是复数。"]]},
+{h:"天气用 it 作主语",b:"说天气、时间、距离时，主语用 it，这个 it 没有实际意思。",f:[["好天气","It's a fine day today."],["下雨","It's raining."],["阳光","The sun is shining."]],e:[["Today is fine day.","It's a fine day today.","天气用 it 开头，单数名词前要加 a。"],["It is rain.","It is raining.","rain 是动词，要用进行时。"]]}],
+x:[["美国人说飞机是 airplane，口语常说 plane。","The plane is in the sky."],["夸天气好：","What a beautiful day!"]],
+q:[["The children ___ swimming.","are"],["___ a fine day today.","It's"],["The sun ___ shining.","is"],["It ___ raining.","is"]]},
+35:{p:[{h:"静态位置介词",b:"between 在两者之间，beside 在旁边，in 在里面，on 在表面上。",f:[["之间","The village is between two hills."],["旁边","The park is beside the river."],["在河岸上","They're on the bank."]],e:[["between three hills","among the hills","三者以上用 among（后面会学）。"]]},
+{h:"动态方向介词",b:"along 沿着，across 横穿（平面），over 越过（上方），under 从下面穿过，into 进入，off 离开（表面）。",f:[["沿着","We're walking along the river."],["横穿","The cat is running across the grass."],["越过","They're walking over the bridge."],["进入","He's jumping into the water."]],e:[["walk on the bridge（过桥）","walk over the bridge","表示过桥要用 over 或 across。"],["jump in the river（跳入）","jump into the river","表示从外到内的动作用 into。"]]}],
+x:[["描述照片：","This is a picture of my hometown."],["问路时常用：","Go across the street."]],
+q:[["The village is ___ two hills.","between"],["They're walking ___ the river bank.","along"],["He's jumping ___ the water.","into"],["The cat is running ___ the grass.","across"]]},
+37:{p:[{h:"be going to 的结构",b:"am / is / are + going to + 动词原形。",f:[["肯定","I'm going to paint it."],["否定","I'm not going to paint it."],["疑问","Are you going to paint it?"],["特殊疑问","What are you going to do?"]],e:[["I going to paint it.","I'm going to paint it.","不能漏掉 be。"],["I'm going to painting.","I'm going to paint.","going to 后面接动词原形。"]]},
+{h:"两种用法",b:"一是事先打算好的事；二是根据眼前的迹象，判断马上要发生的事。",f:[["打算","I'm going to clean the room this afternoon."],["迹象","Look at the clouds. It's going to rain."]],e:[["my most favourite colour","my favourite colour","favourite 本身就是「最喜欢的」。"]]}],
+x:[["美国人口语里 going to 常读成 gonna，自己说时先说完整的。","I'm gonna paint it."],["美式拼写是 favorite。","Pink is my favorite color."]],
+q:[["I'm going to ___ it.（paint）","paint"],["What ___ you going to do?","are"],["She ___ going to clean the room.","is"],["Look! It's going to ___.","rain"]]},
+39:{p:[{h:"双宾语动词",b:"show、give、send、take 可以接「人」和「物」两个宾语。物是代词时用 to 结构。",f:[["人在前","Show me the vase."],["物在前","Show the vase to me."],["代词","I'm going to show it to her."]],e:[["Show me it.","Show it to me.","代词宾语用 to 结构。"]]},
+{h:"否定祈使与 Be careful",b:"Don't + 动词原形表示禁止或提醒。形容词作祈使句时要加 Be。",f:[["否定","Don't drop it!"],["形容词","Be careful!"],["在…前面","Put it in front of the window."]],e:[["Don't to drop it.","Don't drop it.","Don't 后面接动词原形。"],["Careful the vase.","Be careful with the vase.","「小心某物」用 be careful with。"]]}],
+x:[["in front of 在…外部的前面；in the front of 在…内部的前部。","He's sitting in the front of the car."],["提醒别人小心：","Watch out!"]],
+q:[["I'm going to show ___ to my wife.（它）","it"],["___ drop it!","Don't"],["Put it ___ front of the window.","in"],["___ careful!","Be"]]},
+41:{p:[{h:"可数与不可数",b:"bread、cheese、sugar、coffee、tea、soap、water 是不可数名词，不加 a，也不加 s。",f:[["不可数","There's some bread."],["可数","There's an egg."]],e:[["a bread","a loaf of bread","不可数名词不能直接加 a。"],["There are some cheese.","There is some cheese.","不可数名词按单数处理。"]]},
+{h:"量词",b:"用量词表示数量：a loaf of bread，a piece of cheese，a bar of chocolate，a pound of sugar，a cup of tea。复数时量词变复数，名词不变。",f:[["一条面包","a loaf of bread"],["两条面包","two loaves of bread"],["一块巧克力","a bar of chocolate"],["一杯茶","a cup of tea"]],e:[["two breads","two loaves of bread","名词不变，量词变复数。"]]}],
+x:[["美国人口语里点咖啡：","Can I get a coffee, please?"],["这里 a coffee 指一杯咖啡，点单时口语这样说很自然。",""]],
+q:[["a ___ of bread","loaf"],["Is there ___ sugar?","any"],["two ___ of chocolate","bars"],["There ___ some tea.","is"]]},
+43:{p:[{h:"情态动词 can",b:"can + 动词原形，表示能力或可以。所有人称都用 can，不加 s。",f:[["肯定","I can find it."],["否定","I can't find the kettle."],["疑问","Can you make the tea?"],["回答","Yes, I can."],["否定回答","No, I can't."]],e:[["He cans swim.","He can swim.","can 没有第三人称变化。"],["Can you to swim?","Can you swim?","can 后面接动词原形。"],["Do you can swim?","Can you swim?","can 本身就能构成疑问，不用 do。"]]},
+{h:"Of course",b:"回答请求时表示「当然可以」。",f:[["请求","Can you help me?"],["回答","Of course."]],e:[]}],
+x:[["美式英语 can't 读 /kænt/，can 在句中常弱读成 /kən/，靠这个区分肯定和否定。","I can do it. I can't do it."],["美国人回答请求常说：","Sure."]],
+q:[["___ you make the tea?","Can"],["He can ___ it.（find）","find"],["I ___ find the kettle.（不能）","can't"],["Can she swim? Yes, she ___.","can"]]},
+45:{p:[{h:"Can I…? 请求与主动帮忙",b:"Can I + 动词原形，可以请求许可，也可以主动提供帮助。",f:[["请求","Can I use your phone?"],["主动帮忙","Can I help you?"],["回答","Yes, please."]],e:[["Can I help you? — Yes, you can.","Can I help you? — Yes, please.","别人主动提供帮助时，回答 Yes, please 或 No, thanks。"]]},
+{h:"特殊疑问句里的 can",b:"疑问词 + can + 主语 + 动词原形。",f:[["什么","What can you do?"],["哪里","Where can I buy a ticket?"]],e:[["What you can do?","What can you do?","疑问句里 can 放到主语前面。"]]}],
+x:[["更礼貌的请求用 could：","Could you type this letter for me?"],["店员常说：","How can I help you?"]],
+q:[["___ I help you?","Can"],["What ___ you do?","can"],["Can I help you? — Yes, ___.","please"],["Where ___ I buy a ticket?","can"]]},
+47:{p:[{h:"一般现在时：do / don't",b:"I / you / we / they + 动词原形。疑问和否定借助 do。",f:[["肯定","I like coffee."],["否定","I don't like sugar."],["疑问","Do you like tea?"],["回答","Yes, I do."],["否定回答","No, I don't."]],e:[["I am like coffee.","I like coffee.","be 动词和实义动词不能一起用。中国人很常犯。"],["Do you like coffee? Yes, I like.","Yes, I do.","简答用 do 代替。"]]},
+{h:"like 与 want",b:"like 是一贯的喜欢，want 是此刻想要。",f:[["喜欢","I like coffee."],["想要","I want a cup of coffee."],["要不要","Do you want some milk?"]],e:[["I don't like sugar too.","I don't like sugar either.","否定句里的「也」用 either。"]]}],
+x:[["美国人请人喝东西更礼貌的说法：","Would you like some coffee?"],["回答：","Yes, please. / No, thanks."]],
+q:[["___ you like tea?","Do"],["Yes, I ___.","do"],["I ___ like sugar.","don't"],["I don't like it ___.（也）","either"]]},
+49:{p:[{h:"第三人称单数",b:"主语是 he / she / it 或单数名词时，动词加 s。疑问和否定借助 does，后面的动词回到原形。",f:[["肯定","He likes beef."],["否定","He doesn't like lamb."],["疑问","Does he like steak?"],["回答","Yes, he does."],["特殊疑问","What does your wife like?"]],e:[["He like beef.","He likes beef.","第三人称单数要加 s，口语里最容易漏。"],["Does he likes beef?","Does he like beef?","有了 does，动词回到原形。"],["He doesn't likes it.","He doesn't like it.","同上。"]]},
+{h:"too 与 either",b:"肯定句的「也」用 too，否定句的「也」用 either，都放在句末。",f:[["肯定","I like beef, too."],["否定","I don't like lamb, either."]],e:[["I don't like it too.","I don't like it either.","否定句用 either。"]]}],
+x:[["美国人叫肉末是 ground beef。","I want a pound of ground beef."],["美式回应「我也不」：","Me neither."]],
+q:[["My husband ___ beef.（like）","likes"],["___ he like lamb?","Does"],["He ___ like chicken.","doesn't"],["I don't like it ___.","either"]]},
+51:{p:[{h:"频度副词",b:"always 总是 > usually 通常 > often 经常 > sometimes 有时 > never 从不。位置：放在 be 动词后面，实义动词前面。",f:[["实义动词前","It often rains in spring."],["be 动词后","It is always warm."],["从不","It never snows here."]],e:[["It rains often.","It often rains.","先记标准位置：实义动词前。"]]},
+{h:"What's … like?",b:"问某物怎么样（性质、特点），回答描述它。",f:[["问气候","What's the climate like?"],["答","It's very pleasant."],["问天气","What's the weather like today?"]],e:[["How is the climate like?","What's the climate like?","what 和 like 搭配，不用 how。"]]},
+{h:"来自哪里",b:"Where do you come from? = Where are you from? 季节和月份前用 in。",f:[["问","Where are you from?"],["答","I come from China."],["季节","in spring"],["月份","in January"]],e:[["Where are you come from?","Where do you come from?","come 是实义动词，用 do。"],["on spring","in spring","季节前用 in。"]]}],
+x:[["美国人叫秋天常说 fall。","I like fall best."],["聊天气是最安全的开场白：","Nice weather today, isn't it?"]],
+q:[["Where ___ you come from?","do"],["It ___ rains in spring.（经常）","often"],["What's the climate ___?","like"],["___ January","In"]]},
+53:{p:[{h:"三单 -s 的拼写",b:"一般加 s；以 s、x、ch、sh、o 结尾加 es；辅音字母 + y 结尾，改 y 为 i 再加 es。",f:[["加 s","rise → rises"],["加 es","watch → watches"],["加 es","go → goes"],["改 ies","cry → cries"]],e:[["He watchs TV.","He watches TV.","ch 结尾加 es。"],["She gos home.","She goes home.","o 结尾加 es。"]]},
+{h:"三单 -s 的读音",b:"清辅音后读 /s/（works）；浊辅音和元音后读 /z/（rains, goes）；s、z、ʃ、tʃ、dʒ 后读 /ɪz/（watches, washes）。",f:[["/s/","He works hard."],["/z/","It rains a lot."],["/ɪz/","She watches TV."]],e:[]},
+{h:"like … best",b:"问最喜欢哪个：Which … do you like best?",f:[["问","Which season do you like best?"],["答","I like autumn best."]],e:[["in north","in the north","方位名词前要加 the。"]]}],
+x:[["美国人更常说：","What's your favorite season?"],["回答：","Definitely fall."]],
+q:[["The sun ___ early.（rise）","rises"],["He ___ TV.（watch）","watches"],["It ___ a lot here.（rain）","rains"],["Which season do you like ___?","best"]]},
+55:{p:[{h:"一般现在时描述日常",b:"用一般现在时说习惯和日常安排，常与 usually、every day 连用。",f:[["习惯","I usually get up at seven."],["第三人称","She does the housework."],["问","What does he do in the evening?"]],e:[["She do the housework.","She does the housework.","第三人称用 does。"]]},
+{h:"时间介词",b:"in the morning / afternoon / evening；at night，at seven o'clock，at noon；on Sunday。",f:[["上午","in the morning"],["夜里","at night"],["几点","at seven o'clock"],["星期几","on Sunday"]],e:[["in night","at night","night 前用 at。"],["in Sunday","on Sunday","星期前用 on。"]]},
+{h:"不加冠词的固定说法",b:"have breakfast / lunch / dinner，go home，go to work，go to school。",f:[["吃午饭","We have lunch at twelve."],["回家","He goes home at six."]],e:[["go to home","go home","home 前不加 to。"],["have a lunch","have lunch","三餐前一般不加冠词。"]]}],
+x:[["美国人说晚饭一般用 dinner。","We have dinner at six."],["描述周末：","I usually sleep in on Sundays."]],
+q:[["She does the housework ___ the morning.","in"],["They come home ___ night.","at"],["We have lunch ___ twelve o'clock.","at"],["He goes ___ every evening.","home"]]},
+57:{p:[{h:"一般现在时 vs 现在进行时",b:"经常发生的事用一般现在时（usually, every day, often）；此刻正在发生的事用现在进行时（now, today, at the moment）。",f:[["习惯","He usually drinks tea."],["此刻","Today he's drinking coffee."],["习惯","She usually goes by bus."],["此刻","But today she's walking."]],e:[["I am usually walking to work.","I usually walk to work.","习惯用一般现在时。"],["Now he drinks tea.","Now he is drinking tea.","now 表示此刻，用进行时。"]]},
+{h:"时间的说法",b:"整点用 o'clock：It's eight o'clock.  半点：half past seven。差一刻：a quarter to nine。",f:[["问","What time is it?"],["整点","It's ten o'clock."],["交通","She goes by bus."],["步行","She goes on foot."]],e:[["by foot","on foot","步行用 on foot。"]]}],
+x:[["美国人报时更常直接读数字：","It's seven thirty."],["美国人说商店是 store。","I'm going to the store."]],
+q:[["He usually ___ by bus.（go）","goes"],["Today he ___.（walk）","is walking"],["At the moment she ___.（read）","is reading"],["She goes to work ___ foot.","on"]]},
+59:{p:[{h:"have / has",b:"have 表示「有」，第三人称用 has。疑问和否定借助 do / does。",f:[["肯定","She has some envelopes."],["疑问","Do you have any glue?"],["否定","I don't have any glue."]],e:[["He have a car.","He has a car.","第三人称用 has。"],["Does she has…?","Does she have…?","does 后面用原形 have。"]]},
+{h:"选择疑问句 or",b:"A or B? 回答直接选一个，不用 yes / no。语调是前升后降。",f:[["问","Large or small?"],["答","The small one, please."]],e:[["Large or small? — Yes.","The large one.","选择疑问句不能用 yes / no 回答。"]]}],
+x:[["美国店员结账时常问：","Will that be all?"],["找零：","Here's your change."]],
+q:[["She ___ some envelopes.","has"],["Do you have ___ chalk?","any"],["I ___ have any glue.","don't"],["Large ___ small?","or"]]},
+61:{p:[{h:"have 表示生病",b:"have a cold 感冒，have a headache 头疼，have a temperature 发烧，have a stomachache 胃疼。",f:[["感冒","He has a bad cold."],["头疼","I have a headache."],["发烧","She has a temperature."]],e:[["I am headache.","I have a headache.","生病用 have，不用 be。"]]},
+{h:"系动词 feel / look + 形容词",b:"feel（感觉）、look（看起来）后面接形容词，不接副词。",f:[["感觉","I feel ill."],["看起来","You look tired."],["问","How do you feel?"]],e:[["You look tiredly.","You look tired.","系动词后用形容词。"]]},
+{h:"must 复习",b:"must + 动词原形，所有人称都一样。",f:[["必须","You must stay in bed."],["必须","He must call the doctor."]],e:[["He musts stay in bed.","He must stay in bed.","must 没有第三人称变化。"]]}],
+x:[["美国人感冒说：","I have a cold."],["发烧在美国更常说 fever：","She has a fever."],["祝别人早日康复：","Feel better soon."]],
+q:[["He ___ a bad cold.","has"],["You look ___.（tired）","tired"],["She must ___ in bed.（stay）","stay"],["I ___ ill.","feel"]]},
+63:{p:[{h:"must 与 mustn't",b:"mustn't = must not，意思是「禁止、一定不要」，不是「不必」。「不必」用 needn't 或 don't have to。",f:[["必须","He must stay in bed."],["禁止","He mustn't get up yet."],["不必","You needn't come tomorrow."]],e:[["Must I take this? — No, you mustn't.（想说不必）","No, you needn't.","mustn't 是禁止，「不必」用 needn't。"],["He mustn't to eat it.","He mustn't eat it.","后面接动词原形。"]]},
+{h:"yet 放在否定句末",b:"yet 用在否定句末，意思是「还（没）」。",f:[["还不能","He can't go out yet."],["还没","She isn't better yet."]],e:[]}],
+x:[["美国人更常用 don't have to 表示不必：","You don't have to come."],["医生叮嘱：","Get plenty of rest."]],
+q:[["He ___ get up yet.（禁止）","mustn't"],["Must I take medicine? No, you ___.（不必）","needn't"],["He must ___ in bed.（stay）","stay"],["He isn't better ___.","yet"]]},
+65:{p:[{h:"反身代词",b:"myself，yourself，himself，herself，itself，ourselves，yourselves，themselves。常用在 enjoy oneself（玩得开心）和 by oneself / myself（自己）。",f:[["玩得开心","Enjoy yourselves!"],["自己做","I can do it myself."],["独自","He lives by himself."]],e:[["Enjoy you!","Enjoy yourself!","enjoy 后面要接宾语，表示自己时用反身代词。"],["by him","by himself","表示独自用反身代词。"]]},
+{h:"时间的说法",b:"过几分用 past，差几分用 to；一刻是 a quarter，半小时是 half。",f:[["七点半","It's half past seven."],["八点一刻","It's a quarter past eight."],["差一刻九点","It's a quarter to nine."]],e:[["half past to eight（想说七点半）","half past seven","half past 后面是已经过的那个整点。"]]}],
+x:[["美国人报时多直接读数字：","It's eight forty-five."],["出门前的叮嘱：","Have fun!"]],
+q:[["Enjoy ___!（你们）","yourselves"],["I can do it ___.","myself"],["7:30 → It's half ___ seven.","past"],["8:45 → a quarter ___ nine.","to"]]},
+67:{p:[{h:"was / were",b:"be 动词的过去式：I、he、she、it 用 was；you、we、they 用 were。",f:[["肯定","I was at home."],["否定","I wasn't ill."],["疑问","Were you at the office?"],["回答","No, I wasn't."],["特殊疑问","Where were you last weekend?"]],e:[["I were at home.","I was at home.","I 配 was。"],["Yesterday I am at home.","Yesterday I was at home.","yesterday 是过去，用过去式。"]]},
+{h:"过去时间状语",b:"yesterday，last week / weekend / Monday，the day before yesterday。注意 last 前面不加介词。",f:[["昨天","Where were you yesterday?"],["上周末","I was in the country last weekend."]],e:[["on last Monday","last Monday","last 前面不加 on。"]]}],
+x:[["店铺名加 's 表示那家店：at the butcher's。美国人更常说 at the grocery store。","I was at the grocery store."],["问周末过得怎么样：","How was your weekend?"]],
+q:[["Where ___ you yesterday?","were"],["I ___ at home.","was"],["They ___ in the country.","were"],["___ he ill? No, he wasn't.","Was"]]},
+69:{p:[{h:"There was / There were",b:"There be 的过去式：单数和不可数名词用 There was，复数用 There were。",f:[["单数","There was a race last year."],["复数","There were many people."],["疑问","Was there a big crowd?"],["回答","Yes, there was."]],e:[["There had a race.","There was a race.","表示「有」不用 have / had。"],["There was many people.","There were many people.","复数用 were。"]]},
+{h:"年份的读法",b:"2026 读作 two thousand twenty-six（美国人一般省掉 and）；1998 读作 nineteen ninety-eight。年份前用 in。",f:[["2026 年","in two thousand twenty-six"],["1998 年","in nineteen ninety-eight"]],e:[["at 2025","in 2025","年份前用 in。"]]}],
+x:[["描述比赛：","It was so exciting!"],["美国人也常说 twenty twenty-six。","in twenty twenty-six"]],
+q:[["There ___ a race last year.","was"],["There ___ a lot of cars.","were"],["___ there a big crowd?","Was"],["___ 2025","In"]]},
+71:{p:[{h:"规则动词的过去式",b:"一般加 ed；以 e 结尾加 d；辅音字母 + y 结尾改 y 为 i 加 ed；重读闭音节双写加 ed。",f:[["加 ed","answer → answered"],["加 d","telephone → telephoned"],["改 ied","study → studied"],["双写","stop → stopped"]],e:[["He telephone me yesterday.","He telephoned me yesterday.","过去发生的事，动词要用过去式。"],["studyed","studied","辅音 + y 结尾要改 y 为 i。"]]},
+{h:"-ed 的三种读音",b:"清辅音后读 /t/（asked, washed）；浊辅音和元音后读 /d/（answered, played）；t 和 d 后读 /ɪd/（waited, needed）。",f:[["/t/","I washed the dishes."],["/d/","I answered the phone."],["/ɪd/","I waited for an hour."]],e:[["waited 读成 /weɪtd/","/ˈweɪt̬ɪd/","t 和 d 后面要多一个音节。"]]},
+{h:"过去时间状语",b:"yesterday，last night，three times（三次）。",f:[["昨晚","He arrived last night."],["次数","He called me three times."]],e:[["yesterday night","last night","「昨晚」说 last night。"]]}],
+x:[["美国人说打电话更常用 call。","He called me three times yesterday."],["抱怨某人：","He's so annoying!"]],
+q:[["He ___ me yesterday.（telephone）","telephoned"],["I ___ for an hour.（wait）","waited"],["She ___ English last night.（study）","studied"],["I ___ the phone.（answer）","answered"]]}
+};
+
+const KEY="nce1-v1";
+let st={last:null,done:{},rep:{},star:{}};
+try{const r=localStorage.getItem(KEY); if(r) st=Object.assign(st,JSON.parse(r));}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+
+/* speech */
+let voice=null;
+const NOVELTY=/(Fred|Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Wobble|Zarvox|Trinoids|Whisper|Jester|Organ|Superstar|Junior|Ralph|Kathy|Princess|Good News|Hysterical|Deranged|Pipe|Grandma|Grandpa|Rocko|Shelley|Sandy|Flo|Eddy|Reed)/i;
+function voiceScore(v){
+  let s=0; const n=v.name;
+  if(/en[-_]US/i.test(v.lang)) s+=20;
+  if(/premium|高级/i.test(n)) s+=8; else if(/enhanced|增强/i.test(n)) s+=6;
+  if(/natural|neural|online/i.test(n)) s+=6;
+  if(/Google US English/i.test(n)) s+=5;
+  if(/(Ava|Zoe|Allison|Samantha|Nicky|Evan|Tom|Susan|Aria|Jenny|Guy|Michelle)/i.test(n)) s+=3;
+  if(NOVELTY.test(n)) s-=50;
+  return s;
+}
+function enVoices(){ if(!("speechSynthesis" in window)) return []; return speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang)).sort((a,b)=>voiceScore(b)-voiceScore(a)); }
+function pickVoice(){
+  const vs=enVoices(); if(!vs.length) return;
+  voice=(st.voice&&vs.find(v=>v.voiceURI===st.voice))||vs[0];
+}
+if("speechSynthesis" in window){setTimeout(pickVoice,0); speechSynthesis.onvoiceschanged=()=>{pickVoice(); if(document.getElementById("vlist")) settings();};}
+function speak(text,rate=0.9,onword,onend){
+  if(!("speechSynthesis" in window)){toast("这台设备不支持朗读");onend&&onend();return;}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  if(voice){u.voice=voice;u.lang=voice.lang}else u.lang="en-US";
+  u.rate=Math.max(0.4,Math.min(1.4,rate*((st.rate||0.9)/0.9)));
+  if(onword) u.onboundary=e=>{if(e.name==="word"||e.name===undefined) onword(e.charIndex)};
+  u.onend=()=>onend&&onend(); u.onerror=()=>onend&&onend();
+  speechSynthesis.speak(u);
+}
+
+/* recording */
+let rec=null, chunks=[], myURL=null, recOK=null;
+async function startRec(btn,onDone){
+  try{
+    const s=await navigator.mediaDevices.getUserMedia({audio:true});
+    recOK=true; chunks=[];
+    rec=new MediaRecorder(s);
+    rec.ondataavailable=e=>chunks.push(e.data);
+    rec.onstop=()=>{s.getTracks().forEach(t=>t.stop());
+      if(myURL) URL.revokeObjectURL(myURL);
+      myURL=URL.createObjectURL(new Blob(chunks,{type:rec.mimeType||"audio/webm"})); onDone(true);};
+    rec.start(); return true;
+  }catch(e){recOK=false; onDone(false); return false;}
+}
+function playMine(){ if(!myURL) return; const a=new Audio(myURL); a.play().catch(()=>toast("播放失败")); }
+
+const $=s=>document.querySelector(s);
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let tt; function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),1800);}
+const lab=u=>`L${u.n}–${u.n+1}`;
+const icon={
+ play:'<svg class="ico" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5v11l9-5.5z"/></svg>',
+ slow:'<svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/></svg>',
+ mic:'<svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5.5" y="1.5" width="5" height="8" rx="2.5"/><path d="M3 7.5a5 5 0 0 0 10 0M8 12.5V15"/></svg>',
+ ear:'<svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6v4h3l4 3V3L6 6z"/><path d="M12.5 5.5a3.5 3.5 0 0 1 0 5"/></svg>'
+};
+
+/* views */
+function home(){
+  speechSynthesis&&speechSynthesis.cancel&&speechSynthesis.cancel();
+  const last=U.find(u=>u.n===st.last)||U.find(u=>!st.done[u.n])||U[0];
+  const doneN=Object.keys(st.done).length;
+  $("#app").innerHTML=`
+  <header class="top"><h1>新概念一册跟读</h1><span class="hr"><span class="sub mono">${doneN} / ${U.length} 单元</span><button class="chip" id="toset">声音</button></span></header>
+  <button class="resume" id="resume">
+    <span style="min-width:0"><small>${st.last?"继续上次":"从这里开始"} · <span class="mono">${lab(last)}</span></small><span class="en">${esc(last.t)}</span></span>
+    <span class="go">继续</span></button>
+  <button class="phbtn" id="toph"><span><b>美式音标表</b><small>${PH.length} 个音标，每个配例词和口型提示</small></span><span class="ipa">/æ ɚ θ ð/</span></button>
+  <p class="label">全部单元</p>
+  <div class="list">${U.map(u=>{
+    const reps=st.rep[u.n]?Object.keys(st.rep[u.n]).length:0;
+    const cls=st.done[u.n]?"done":(reps?"part":"");
+    return `<button class="row" data-u="${u.n}"><span class="num mono">${lab(u)}</span><span class="t">${esc(u.t)}<span class="g">${esc(u.g)}</span></span><span class="dot ${cls}" aria-label="${st.done[u.n]?"已完成":reps?"进行中":"未开始"}"></span></button>`}).join("")}
+  </div>
+  <p class="note">目前收录第 1–72 课（36 个单元），每单元对应一组课：奇数课课文 + 偶数课练习。单词和语法点按教材排列，发音和音标统一用美式；教材本身是英式拼写，美国人说法不同的词会单独标出。跟读句是按本课语法自编的练习句，不是课文原文，课文请配合 Leo 老师的视频。学到第 73 课时告诉我，我把后面的补上。</p>`;
+  $("#resume").onclick=()=>lesson(last.n);
+  $("#toph").onclick=()=>phonetics();
+  $("#toset").onclick=settings;
+  document.querySelectorAll(".row").forEach(b=>b.onclick=()=>lesson(+b.dataset.u));
+  window.scrollTo(0,0);
+}
+
+let cur=null, tab="w", si=0, hideZh=false, onlyStar=false;
+function lesson(n,t){
+  cur=U.find(u=>u.n===n); st.last=n; save(); if(t) tab=t; si=0;
+  $("#app").innerHTML=`
+  <div class="bar"><div class="head"><button class="back" id="back">‹ 目录</button><h2>${esc(cur.t)}</h2><span class="lnum mono">${lab(cur)}</span></div>
+  <div class="tabs" role="tablist">
+   <button role="tab" data-t="w" aria-selected="${tab==="w"}">单词</button>
+   <button role="tab" data-t="g" aria-selected="${tab==="g"}">语法</button>
+   <button role="tab" data-t="s" aria-selected="${tab==="s"}">跟读</button></div></div>
+  <div class="panel" id="panel"></div>`;
+  $("#back").onclick=home;
+  document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{tab=b.dataset.t;
+    document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));render();});
+  render(); window.scrollTo(0,0);
+}
+function render(){ speechSynthesis&&speechSynthesis.cancel&&speechSynthesis.cancel(); ({w:words,g:gram,s:shadow})[tab](); }
+
+function words(){
+  const stars=st.star[cur.n]||{};
+  const list=cur.w.filter(w=>!onlyStar||stars[w[0]]);
+  $("#panel").innerHTML=`
+  <div class="tools">
+    <button class="chip" id="all">${icon.play.replace('class="ico"','class="ico" style="width:12px;height:12px;vertical-align:-1px"')} 连续播放</button>
+    <button class="chip" id="hz" aria-pressed="${hideZh}">遮住中文</button>
+    <button class="chip" id="os" aria-pressed="${onlyStar}">只看不熟 ${Object.keys(stars).length||""}</button>
+  </div>
+  <div class="words ${hideZh?"hide":""}">${list.length?list.map((w,i)=>`
+    <div class="w" data-i="${i}" role="button" tabindex="0"><span class="wl"><span class="e">${esc(w[0])}</span>${P[w[0]]?`<button class="ipa" data-k="${esc(w[0])}" aria-label="拆开音标">/${esc(P[w[0]])}/</button>`:""}${US[w[0]]?`<span class="us">美 ${esc(US[w[0]])}</span>`:""}</span><span class="z">${esc(w[1])}</span>
+    <button class="star ${stars[w[0]]?"on":""}" data-k="${esc(w[0])}" aria-label="标记不熟">${stars[w[0]]?"★":"☆"}</button></div>`).join("")
+    :`<div class="w"><span class="z" style="text-align:left">还没有标记不熟的词。点单词右边的 ☆ 标记。</span></div>`}</div>
+  <p class="how">点单词听发音，遮住中文时点一下会露出中文。点音标可以把这个词拆成一个个音标逐个听。不熟的点 ☆，之后可以只刷这几个。标「美」的是美国人更常用的说法。</p>
+  <button class="btn finish" id="toph" style="margin-top:10px">音标表</button>
+  <button class="btn finish" id="tos">去跟读 ›</button>`;
+  const rows=[...document.querySelectorAll(".w[data-i]")];
+  rows.forEach(r=>{const go=()=>{const w=list[+r.dataset.i];r.classList.toggle("peek");speak(w[0],0.85)};
+    r.onclick=e=>{if(e.target.closest(".star")||e.target.closest(".ipa"))return;go()};
+    r.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}};});
+  document.querySelectorAll(".star").forEach(b=>b.onclick=()=>{const k=b.dataset.k;
+    st.star[cur.n]=st.star[cur.n]||{}; if(st.star[cur.n][k]) delete st.star[cur.n][k]; else st.star[cur.n][k]=1; save(); words();});
+  $("#hz").onclick=()=>{hideZh=!hideZh;words()};
+  $("#os").onclick=()=>{onlyStar=!onlyStar;words()};
+  $("#tos").onclick=()=>{tab="s";lesson(cur.n,"s")};
+  $("#toph").onclick=()=>phonetics(cur.n);
+  document.querySelectorAll(".ipa").forEach(b=>b.onclick=e=>{e.stopPropagation();sheet(b.dataset.k)});
+  let playing=false;
+  $("#all").onclick=()=>{
+    if(playing){playing=false;speechSynthesis.cancel();rows.forEach(r=>r.classList.remove("playing"));return;}
+    playing=true; let i=0;
+    const step=()=>{rows.forEach(r=>r.classList.remove("playing"));
+      if(!playing||i>=rows.length){playing=false;return;}
+      const r=rows[i]; r.classList.add("playing"); r.scrollIntoView({block:"nearest"});
+      speak(list[i][0],0.85,null,()=>{i++;setTimeout(step,1400)});};
+    step();
+  };
+}
+
+function gram(){
+  const g=G[cur.n];
+  const pt=(p,i)=>`<section class="gp">
+    <p class="gk mono">要点 ${i+1} / ${g.p.length}</p>
+    <h3>${esc(p.h)}</h3><p class="gb">${esc(p.b)}</p>
+    <div class="forms">${p.f.map(f=>`<div class="fr"><span class="fl">${esc(f[0])}</span><button class="fe" data-s="${esc(f[1])}">${esc(f[1])}</button></div>`).join("")}</div>
+    ${p.e.length?`<div class="errs"><p class="ek">易错</p>${p.e.map(e=>`<div class="er"><div class="bad"><span class="mk">✗</span><s>${esc(e[0])}</s></div><div class="good"><span class="mk">✓</span><button class="fe" data-s="${esc(e[1])}">${esc(e[1])}</button></div><div class="why">${esc(e[2])}</div></div>`).join("")}</div>`:""}
+  </section>`;
+  $("#panel").innerHTML=`<div class="gram">
+   ${g.p.map(pt).join("")}
+   <section class="gp ext"><p class="ek">拓展 · 美国人这么说</p>${g.x.map(x=>`<div class="xr"><p>${esc(x[0])}</p>${x[1]?`<button class="fe" data-s="${esc(x[1])}">${esc(x[1])}</button>`:""}</div>`).join("")}</section>
+   <section class="gp"><p class="ek">小测 · 点一下看答案</p><div class="quiz">${g.q.map(q=>`<button class="qz"><span class="qq">${esc(q[0])}</span><span class="qa">${esc(q[1])}</span></button>`).join("")}</div></section>
+   <p class="how">英文都可以点着听。用每个句型，换成自己身边的人和东西各说一句，比看十遍更有用。</p>
+   <button class="btn finish" id="tos">去跟读 ›</button></div>`;
+  document.querySelectorAll(".gram .fe").forEach(b=>b.onclick=()=>speak(b.dataset.s,0.9));
+  document.querySelectorAll(".qz").forEach(b=>b.onclick=()=>b.classList.toggle("show"));
+  $("#tos").onclick=()=>lesson(cur.n,"s");
+}
+
+function hl(w,part){const i=w.indexOf(part); if(i<0) return esc(w); return esc(w.slice(0,i))+"<b>"+esc(part)+"</b>"+esc(w.slice(i+part.length));}
+function phCard(p){return `<div class="ph"><div class="phh"><span class="sym">/${esc(p[0])}/</span><span class="pht">${esc(p[1])}</span></div>
+  <p class="tip">${esc(p[2])}</p><div class="phx">${p[3].map(x=>`<button class="pw" data-s="${esc(x[0])}">${hl(x[0],x[1])}</button>`).join("")}</div></div>`;}
+function bindPw(root){root.querySelectorAll(".pw").forEach(b=>b.onclick=()=>{root.querySelectorAll(".pw").forEach(x=>x.classList.remove("on"));b.classList.add("on");speak(b.dataset.s,0.8,null,()=>b.classList.remove("on"))});}
+function sheet(word){
+  const toks=[...new Set(ipaTokens(P[word]))].filter(t=>PHM[t]);
+  const s=$("#sheet");
+  s.innerHTML=`<div class="sh-bg" id="shbg"></div><div class="sh" role="dialog" aria-label="音标拆解">
+   <div class="shh"><button class="en shw" id="shw">${esc(word)}</button><span class="ipa big">/${esc(P[word])}/</span><button class="shx" id="shx">关闭</button></div>
+   <p class="how" style="margin:0 0 10px">这个词用到 ${toks.length} 个音标。点例词听，加粗的字母就是这个音。</p>
+   <div class="phs">${toks.map(t=>phCard(PHM[t])).join("")}</div></div>`;
+  s.hidden=false; bindPw(s);
+  $("#shw").onclick=()=>speak(word,0.8);
+  $("#shbg").onclick=$("#shx").onclick=()=>{s.hidden=true;s.innerHTML="";speechSynthesis.cancel()};
+  speak(word,0.8);
+}
+function settings(){
+  speechSynthesis&&speechSynthesis.cancel&&speechSynthesis.cancel();
+  const vs=enVoices(), showAll=!!st.allVoices;
+  const list=showAll?vs:vs.filter(v=>/en[-_]US/i.test(v.lang)&&!NOVELTY.test(v.name));
+  const rate=st.rate||0.9;
+  $("#app").innerHTML=`
+  <div class="bar"><div class="head"><button class="back" id="back">‹ 目录</button><h2>声音设置</h2></div></div>
+  <p class="label" style="margin-top:6px">语速 <span class="mono" id="rv">${rate.toFixed(2)}</span></p>
+  <div class="rate"><span>慢</span><input type="range" id="rate" min="0.6" max="1.1" step="0.05" value="${rate}"><span>快</span><button class="chip" id="rtest">试听</button></div>
+  <p class="label" style="margin-top:22px">选择声音 · ${list.length} 个</p>
+  <div class="words" id="vlist">${list.length?list.map(v=>`
+    <div class="w vr ${voice&&voice.voiceURI===v.voiceURI?"sel":""}" data-u="${esc(v.voiceURI)}" role="button" tabindex="0">
+      <span class="wl"><span class="vn">${esc(v.name)}</span><span class="us">${esc(v.lang)}${/premium|enhanced|高级|增强|natural|neural/i.test(v.name)?" · 高质量":""}</span></span>
+      <span class="z">${voice&&voice.voiceURI===v.voiceURI?"使用中":"试听"}</span><span></span></div>`).join("")
+    :`<div class="w"><span class="z" style="text-align:left">这台设备没有找到美式英语声音。打开下面的「显示全部英语声音」看看，或按下方说明下载。</span></div>`}</div>
+  <div class="tools" style="margin-top:10px"><button class="chip" id="allv" aria-pressed="${showAll}">显示全部英语声音</button></div>
+  <div class="guide">
+    <p class="ek">声音听起来怪，多半是用了系统自带的精简版声音</p>
+    <p><b>iPhone：</b>设置 → 辅助功能 → 朗读内容 → 声音 → 英语 → 英语（美国）→ 选 Ava、Zoe 或 Evan，点「高级」版本下载（每个约 300 MB，建议连 Wi-Fi）。下载完彻底关掉 app 再打开，回到这里选带「高级 / Premium」的那一个。</p>
+    <p><b>安卓：</b>设置 → 系统 → 语言和输入法 → 文字转语音 → 首选引擎选「Google 语音服务」→ 安装语音数据 → 英语（美国）→ 选一个声音下载。部分国产手机自带引擎读英语效果较差，可以在应用商店安装「Google 语音服务」。</p>
+    <p>这是手机系统自带的朗读，高质量声音会自然很多，但还是比不上真人录音，语调可以参考，细节以教材原声为准。</p>
+  </div>`;
+  $("#back").onclick=home;
+  const r=$("#rate");
+  r.oninput=()=>{st.rate=+r.value;$("#rv").textContent=(+r.value).toFixed(2);save();};
+  $("#rtest").onclick=()=>speak("Excuse me. Is this your handbag?",0.9);
+  document.querySelectorAll(".vr").forEach(row=>{const go=()=>{
+      const v=vs.find(x=>x.voiceURI===row.dataset.u); if(!v) return;
+      voice=v; st.voice=v.voiceURI; save();
+      document.querySelectorAll(".vr").forEach(x=>{x.classList.toggle("sel",x===row);x.querySelector(".z").textContent=x===row?"使用中":"试听";});
+      speak("Nice to meet you. How are you today?",0.9);};
+    row.onclick=go; row.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}};});
+  $("#allv").onclick=()=>{st.allVoices=!showAll;save();settings();};
+  window.scrollTo(0,0);
+}
+function phonetics(from){
+  speechSynthesis&&speechSynthesis.cancel&&speechSynthesis.cancel();
+  $("#app").innerHTML=`
+  <div class="bar"><div class="head"><button class="back" id="back">‹ ${from?"返回本课":"目录"}</button><h2>美式音标表</h2><span class="lnum mono">${PH.length} 个</span></div></div>
+  <p class="how" style="margin-top:0">标注采用剑桥词典美式（US）体系，查词时可以直接对照。手机朗读引擎读不出单独的音标，所以每个音标配了 3 个例词，加粗的字母就是这个音。先看口型提示，再听例词，最后自己把这个音单独发出来。</p>
+  ${PHG.map(g=>`<p class="label" style="margin-top:22px">${g[0]}</p><div class="phs">${PH.slice(g[1],g[2]).map(phCard).join("")}</div>`).join("")}`;
+  bindPw($("#app"));
+  $("#back").onclick=()=>from?lesson(from,"w"):home();
+  window.scrollTo(0,0);
+}
+
+function shadow(){
+  const s=cur.s[si]; const reps=(st.rep[cur.n]||{})[si]||0;
+  if(myURL){URL.revokeObjectURL(myURL);myURL=null}
+  const toks=s[0].split(/(\s+)/);
+  $("#panel").innerHTML=`
+  <div class="card">
+    <div class="pos"><span class="mono">${si+1} / ${cur.s.length}</span><button id="hz2" class="chip" style="padding:2px 10px" aria-pressed="${hideZh}">遮住中文</button></div>
+    <p class="sent" id="sent">${toks.map(t=>/\s/.test(t)?t:`<span class="wd">${esc(t)}</span>`).join("")}</p>
+    <div class="czh ${hideZh?"hid":""}" id="czh">${esc(s[1])}</div>
+    <div class="ctrls">
+      <button class="btn primary" id="p1">${icon.play} 示范</button>
+      <button class="btn" id="p2">${icon.slow} 慢速</button>
+      <button class="btn rec" id="rc">${icon.mic} <span>录我的</span></button>
+      <button class="btn" id="pm" disabled>${icon.ear} 听我的</button>
+    </div>
+    <div class="upload" id="up"><span>这个窗口里麦克风用不了。可以用手机录音后选文件：</span><label>选择录音<input type="file" id="fi" accept="audio/*" capture></label></div>
+    <div class="tally" id="tally">${reps?`这句已跟读 <b>${reps}</b> 遍`:"听一遍，跟着大声说一遍"}</div>
+    <div class="steps">
+      <button class="btn" id="prev" ${si===0?"disabled":""}>‹ 上一句</button>
+      <button class="btn" id="said">我说了 +1</button>
+      <button class="btn" id="next">${si===cur.s.length-1?"完成":"下一句 ›"}</button>
+    </div>
+  </div>
+  <p class="how">建议节奏：示范 → 跟说 → 慢速 → 再跟说。能录音时，录一遍和示范对比，重点听尾音（-s、-ed）和句尾升降调。</p>`;
+  const spans=[...document.querySelectorAll("#sent .wd")];
+  const starts=[]; {let p=0; toks.forEach(t=>{if(!/\s/.test(t)) starts.push(p); p+=t.length;});}
+  const hl=ci=>{let k=0; for(let i=0;i<starts.length;i++) if(starts[i]<=ci) k=i; spans.forEach((x,i)=>x.classList.toggle("on",i===k));};
+  const clr=()=>spans.forEach(x=>x.classList.remove("on"));
+  $("#p1").onclick=()=>speak(s[0],0.9,hl,clr);
+  $("#p2").onclick=()=>speak(s[0],0.6,hl,clr);
+  $("#hz2").onclick=()=>{hideZh=!hideZh;$("#czh").classList.toggle("hid",hideZh);$("#hz2").setAttribute("aria-pressed",hideZh)};
+  $("#czh").onclick=()=>$("#czh").classList.toggle("hid");
+  const rc=$("#rc"), pm=$("#pm");
+  if(recOK===false) $("#up").classList.add("show");
+  rc.onclick=async()=>{
+    if(rec&&rec.state==="recording"){rec.stop();rc.classList.remove("live");rc.querySelector("span").textContent="重录";return;}
+    speechSynthesis.cancel();
+    rc.classList.add("live"); rc.querySelector("span").textContent="停止";
+    await startRec(rc,ok=>{
+      if(ok&&myURL){pm.disabled=false; bump(); playMine();}
+      if(!ok){rc.classList.remove("live");rc.querySelector("span").textContent="录我的";$("#up").classList.add("show");}
+    });
+  };
+  pm.onclick=playMine;
+  $("#fi").onchange=e=>{const f=e.target.files[0]; if(!f) return;
+    if(myURL) URL.revokeObjectURL(myURL); myURL=URL.createObjectURL(f); pm.disabled=false; bump(); playMine();};
+  $("#said").onclick=()=>{bump();toast("+1")};
+  $("#prev").onclick=()=>{si--;shadow()};
+  $("#next").onclick=()=>{ if(si<cur.s.length-1){si++;shadow()} else {st.done[cur.n]=1;save();toast("本单元完成");setTimeout(home,700);} };
+}
+function bump(){
+  st.rep[cur.n]=st.rep[cur.n]||{}; st.rep[cur.n][si]=(st.rep[cur.n][si]||0)+1; save();
+  const t=$("#tally"); if(t) t.innerHTML=`这句已跟读 <b>${st.rep[cur.n][si]}</b> 遍`;
+}
+
+home();
+</script>
+
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}
+</script>
+</body></html>
