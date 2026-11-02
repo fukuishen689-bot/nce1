@@ -172,6 +172,39 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .shw{font-size:26px}
 .ipa.big{font-size:18px;color:var(--sea);flex:1}
 .shx{font-size:14px;color:var(--sea)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:-8px 0 22px}
+.tiles .phbtn{margin:0;align-items:flex-start}
+.term{font:inherit;color:inherit;border-bottom:1px dashed var(--sea);padding:0;line-height:inherit}
+.term:active{background:var(--sea-soft)}
+.intro{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;font-size:13.5px;background:var(--sea-soft);border-radius:10px;padding:10px 14px;margin-bottom:6px}
+.intro span:last-child{color:var(--sea);white-space:nowrap}
+.fms{display:flex;flex-direction:column;gap:10px}
+.fmc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.fmh{display:flex;flex-direction:column;gap:2px}
+.fml{font-size:12px;color:var(--muted)}
+.fmf{font-size:15px;font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:6px 4px;align-items:flex-start;text-align:left}
+.ch{display:flex;flex-direction:column;align-items:center;gap:1px;border-radius:7px;padding:4px 8px 3px;background:var(--bg);border:1px solid var(--line)}
+.ch b{font-family:var(--f-en);font-weight:500;font-size:17px;line-height:1.25}
+.ch i{font-style:normal;font-size:10.5px;color:var(--muted);line-height:1.2}
+.ch.pl{border-color:transparent;background:none;padding-inline:0}
+.r-s{border-color:var(--sea);background:var(--sea-soft)} .r-s i{color:var(--sea)}
+.r-be,.r-aux,.r-lk{border-color:var(--rec)} .r-be i,.r-aux i,.r-lk i{color:var(--rec)}
+.r-v{border-color:var(--ok)} .r-v i{color:var(--ok)}
+.r-q{border-color:var(--ink)} .r-q i{color:var(--ink)}
+.r-n b{color:var(--rec)}
+.st2{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.st2 li::marker{color:var(--sea);font-family:var(--f-mono)}
+.tt{font-size:22px;font-weight:700;flex:1}
+.tdef{font-size:15px;margin:4px 0 12px;line-height:1.75}
+.tex{display:block;font-size:19px}
+.tzh{font-size:13px;color:var(--muted);margin:2px 0 0}
+.gls{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.gl{padding:12px 2px;border-bottom:1px solid var(--line)}
+.gt{font-weight:700;font-size:15.5px;margin:0 0 2px}
+.gd{margin:0;font-size:14px;line-height:1.7}
+.gx{display:block;margin-top:4px;font-size:17px}
+.gz{margin:0;font-size:12.5px;color:var(--muted)}
 .hr{display:flex;align-items:center;gap:10px}
 .rate{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
 .rate input{flex:1;min-width:0;accent-color:var(--sea)}
@@ -503,6 +536,140 @@ x:[["美国人说打电话更常用 call。","He called me three times yesterday
 q:[["He ___ me yesterday.（telephone）","telephoned"],["I ___ for an hour.（wait）","waited"],["She ___ English last night.（study）","studied"],["I ___ the phone.（answer）","answered"]]}
 };
 
+/* 句子成分的颜色角色 */
+const ROLE={s:"主语",be:"be动词",v:"动词",aux:"助动词",c:"表语",o:"宾语",o2:"宾语(物)",n:"否定",q:"疑问词",t:"时间/地点",pp:"介词短语",d:"限定词",adj:"形容词",adv:"副词",p:"介词",s0:"引导词",m:"量词",lk:"系动词",x:"其他"};
+/* 公式与变换步骤：key = 单元号-要点序号 */
+const FM={
+"1-0":{fm:[{t:"陈述句",f:"主语 + be动词 + 表语",ex:[["This","s"],["is","be"],["your pen","c"],[".",""]]},{t:"一般疑问句",f:"Be动词 + 主语 + 表语 + ？",ex:[["Is","be"],["this","s"],["your pen","c"],["?",""]]},{t:"肯定回答",f:"Yes, + 主语 + be动词",ex:[["Yes,",""],["it","s"],["is","be"],[".",""]]},{t:"否定回答",f:"No, + 主语 + be动词 + not",ex:[["No,",""],["it","s"],["isn't","be"],[".",""]]},{t:"否定句",f:"主语 + be动词 + not + 表语",ex:[["This","s"],["is","be"],["not","n"],["my pen","c"],[".",""]]}],
+ st:["从一个陈述句开始：This is your pen.","找到句子里的 be动词：is","把 is 搬到主语 this 前面，首字母改大写：Is this your pen","句号改成问号，句尾读升调 ↗","回答时把 this 换成 it：Yes, it is. / No, it isn't."]},
+"3-0":{fm:[{t:"物主代词 + 名词",f:"my / your + 名词（前面不再加 a / the）",ex:[["This","s"],["is","be"],["my","d"],["ticket","c"],[".",""]]}]},
+"3-1":{fm:[{t:"递东西",f:"Here + is + 东西",ex:[["Here","t"],["is","be"],["your coat","s"],[".",""]]},{t:"提请求",f:"东西 + , please.",ex:[["My coat,","o"],["please.",""]]}]},
+"5-0":{fm:[{t:"介绍别人",f:"This + is + 人",ex:[["This","s"],["is","be"],["Miss Li","c"],[".",""]]}]},
+"5-1":{fm:[{t:"说国籍",f:"主语 + be动词 + 国籍形容词",ex:[["He","s"],["is","be"],["Chinese","c"],[".",""]]},{t:"问牌子",f:"What make + is + 主语 + ？",ex:[["What make","q"],["is","be"],["it","s"],["?",""]]}]},
+"7-0":{fm:[{t:"肯定句",f:"主语 + am / is / are + 表语",ex:[["I","s"],["am","be"],["a nurse","c"],[".",""]]},{t:"否定句",f:"主语 + be动词 + not + 表语",ex:[["I","s"],["am","be"],["not","n"],["a teacher","c"],[".",""]]},{t:"一般疑问句",f:"Be动词 + 主语 + 表语 + ？",ex:[["Are","be"],["you","s"],["a teacher","c"],["?",""]]}]},
+"7-1":{fm:[{t:"特殊疑问句",f:"疑问词 + be动词 + 主语 + ？",ex:[["What","q"],["is","be"],["your name","s"],["?",""]]}],
+ st:["陈述句：Your name is Fukui.","变成一般疑问句：Is your name Fukui?（只能回答是或不是）","如果不知道名字，就把 Fukui 换成疑问词 what","把 what 放到句首：What is your name?","特殊疑问句句尾读降调 ↘，不能用 Yes / No 回答"]},
+"9-0":{fm:[{t:"问候",f:"How + be动词 + 主语 + ？",ex:[["How","q"],["are","be"],["you","s"],["today","t"],["?",""]]}]},
+"9-1":{fm:[{t:"形容词作表语",f:"主语 + be动词 + 形容词",ex:[["He","s"],["is","be"],["very busy","c"],[".",""]]},{t:"一般疑问句",f:"Be动词 + 主语 + 形容词 + ？",ex:[["Is","be"],["she","s"],["tired","c"],["?",""]]}]},
+"11-0":{fm:[{t:"问「谁的」",f:"Whose + 名词 + be动词 + 主语 + ？",ex:[["Whose shirt","q"],["is","be"],["this","s"],["?",""]]}]},
+"11-1":{fm:[{t:"名词所有格",f:"人 + 's + 东西",ex:[["It","s"],["is","be"],["Tim's","d"],["shirt","c"],[".",""]]}]},
+"11-2":{fm:[{t:"物主代词",f:"his / her + 名词",ex:[["It","s"],["is","be"],["his","d"],["tie","c"],[".",""]]}]},
+"13-0":{fm:[{t:"问颜色",f:"What colour + be动词 + 主语 + ？",ex:[["What colour","q"],["is","be"],["your car","s"],["?",""]]}]},
+"13-1":{fm:[{t:"形容词在名词前",f:"a / an + 形容词 + 名词",ex:[["It","s"],["is","be"],["a","d"],["lovely","adj"],["hat","c"],[".",""]]},{t:"形容词在 be 后",f:"主语 + be动词 + 形容词",ex:[["The hat","s"],["is","be"],["lovely","c"],[".",""]]}]},
+"15-1":{fm:[{t:"复数句",f:"These / They + are + 复数名词",ex:[["These","s"],["are","be"],["my cases","c"],[".",""]]}],
+ st:["单数句：This is my case.","This 变 These","is 变 are","case 变 cases","复数句：These are my cases."]},
+"17-0":{fm:[{t:"问人",f:"Who + be动词 + 主语 + ？",ex:[["Who","q"],["is","be"],["that man","s"],["?",""]]},{t:"问职业",f:"What + be动词 + 某人的 jobs + ？",ex:[["What","q"],["are","be"],["their jobs","s"],["?",""]]}]},
+"19-0":{fm:[{t:"关心别人",f:"What + is + the matter + ？",ex:[["What","q"],["is","be"],["the matter","s"],["?",""]]}]},
+"21-0":{fm:[{t:"动词 + 宾格",f:"动词 + 人（宾格）+ 东西",ex:[["Give","v"],["me","o"],["a book","o2"],[".",""]]}]},
+"21-1":{fm:[{t:"另一种语序",f:"动词 + 东西 + to + 人（宾格）",ex:[["Give","v"],["it","o2"],["to","p"],["me","o"],[".",""]]}]},
+"23-0":{fm:[{t:"介词短语放名词后",f:"名词 + 介词短语（说明是哪一个）",ex:[["Give","v"],["me","o"],["the glasses","o2"],["on the shelf","pp"],[".",""]]}]},
+"25-0":{fm:[{t:"某处有某物",f:"There + is + 东西 + 地点",ex:[["There","s0"],["is","be"],["a cooker","s"],["in the kitchen","pp"],[".",""]]},{t:"一般疑问句",f:"Is + there + 东西 + 地点 + ？",ex:[["Is","be"],["there","s0"],["a cup","s"],["on the table","pp"],["?",""]]}],
+ st:["中文说「厨房里有一个炉子」，英语不用 have","先说 There is，再说东西 a cooker，最后说地点 in the kitchen","变一般疑问句：把 is 搬到 there 前面：Is there a cooker in the kitchen?"]},
+"25-1":{fm:[{t:"问位置",f:"Where + is + 主语 + ？",ex:[["Where","q"],["is","be"],["the cooker","s"],["?",""]]}]},
+"27-0":{fm:[{t:"复数",f:"There + are + some + 复数名词 + 地点",ex:[["There","s0"],["are","be"],["some books","s"],["on the shelf","pp"],[".",""]]}]},
+"29-0":{fm:[{t:"祈使句",f:"动词原形 + 其他 (+ please)",ex:[["Shut","v"],["the door,","o"],["please.",""]]},{t:"否定祈使句",f:"Don't + 动词原形 + 其他",ex:[["Don't","n"],["open","v"],["it","o"],["!",""]]}]},
+"29-1":{fm:[{t:"必须",f:"主语 + must + 动词原形 + 其他",ex:[["You","s"],["must","aux"],["open","v"],["the window","o"],[".",""]]}]},
+"31-0":{fm:[{t:"现在进行时",f:"主语 + am / is / are + 动词-ing",ex:[["She","s"],["is","be"],["sitting","v"],["under the tree","pp"],[".",""]]},{t:"特殊疑问句",f:"What + be动词 + 主语 + doing + ？",ex:[["What","q"],["is","be"],["she","s"],["doing","v"],["?",""]]}]},
+"33-0":{fm:[{t:"复数主语",f:"复数主语 + are + 动词-ing",ex:[["The children","s"],["are","be"],["swimming","v"],[".",""]]}]},
+"33-1":{fm:[{t:"说天气",f:"It + is + 天气",ex:[["It","s"],["is","be"],["a fine day","c"],["today","t"],[".",""]]}]},
+"37-0":{fm:[{t:"打算做",f:"主语 + am / is / are + going to + 动词原形",ex:[["I","s"],["am","be"],["going to","aux"],["paint","v"],["it","o"],[".",""]]},{t:"特殊疑问句",f:"What + be动词 + 主语 + going to do + ？",ex:[["What","q"],["are","be"],["you","s"],["going to do","v"],["?",""]]}]},
+"39-0":{fm:[{t:"给某人看",f:"动词 + 东西 + to + 人",ex:[["Show","v"],["it","o2"],["to","p"],["me","o"],[".",""]]}]},
+"39-1":{fm:[{t:"别做",f:"Don't + 动词原形",ex:[["Don't","n"],["drop","v"],["it","o"],["!",""]]},{t:"小心",f:"Be + 形容词",ex:[["Be","be"],["careful","c"],["!",""]]}]},
+"41-1":{fm:[{t:"量词",f:"a + 量词 + of + 不可数名词",ex:[["a loaf of","m"],["bread","c"]]}]},
+"43-0":{fm:[{t:"肯定句",f:"主语 + can + 动词原形",ex:[["I","s"],["can","aux"],["find","v"],["it","o"],[".",""]]},{t:"一般疑问句",f:"Can + 主语 + 动词原形 + ？",ex:[["Can","aux"],["you","s"],["make","v"],["the tea","o"],["?",""]]}],
+ st:["和 be动词一样，can 可以直接搬到主语前面变成疑问句","You can make the tea. → Can you make the tea?","否定直接在 can 后加 not：can't"]},
+"45-0":{fm:[{t:"请求 / 帮忙",f:"Can + I + 动词原形 + ？",ex:[["Can","aux"],["I","s"],["help","v"],["you","o"],["?",""]]}]},
+"45-1":{fm:[{t:"特殊疑问句",f:"疑问词 + can + 主语 + 动词原形 + ？",ex:[["What","q"],["can","aux"],["you","s"],["do","v"],["?",""]]}]},
+"47-0":{fm:[{t:"肯定句",f:"主语 + 实义动词 + 宾语",ex:[["I","s"],["like","v"],["coffee","o"],[".",""]]},{t:"否定句",f:"主语 + don't + 动词原形 + 宾语",ex:[["I","s"],["don't","aux"],["like","v"],["sugar","o"],[".",""]]},{t:"一般疑问句",f:"Do + 主语 + 动词原形 + ？",ex:[["Do","aux"],["you","s"],["like","v"],["tea","o"],["?",""]]}],
+ st:["有 be动词的句子变疑问：把 be 搬到前面（Is this…?）","有 can 的句子：把 can 搬到前面（Can you…?）","句子里只有实义动词（like、want）时，没有能搬的词，就请助动词 do 放到句首帮忙","You like tea. → Do you like tea?","否定同理：在动词前加 don't：I don't like tea."]},
+"49-0":{fm:[{t:"肯定句",f:"he / she / it + 动词s + 宾语",ex:[["He","s"],["likes","v"],["beef","o"],[".",""]]},{t:"否定句",f:"he / she / it + doesn't + 动词原形",ex:[["He","s"],["doesn't","aux"],["like","v"],["lamb","o"],[".",""]]},{t:"一般疑问句",f:"Does + he / she / it + 动词原形 + ？",ex:[["Does","aux"],["he","s"],["like","v"],["steak","o"],["?",""]]}],
+ st:["主语是 he / she / it 或一个人、一样东西时，动词要加 s：He likes beef.","变疑问或否定时，do 换成 does","does 已经带了「三单」，后面的动词就还原，不再加 s：Does he like beef?"]},
+"51-0":{fm:[{t:"频度副词的位置",f:"主语 + 频度副词 + 实义动词",ex:[["It","s"],["often","adv"],["rains","v"],["in spring","pp"],[".",""]]},{t:"在 be 后面",f:"主语 + be动词 + 频度副词 + 形容词",ex:[["It","s"],["is","be"],["always","adv"],["warm","c"],[".",""]]}]},
+"51-1":{fm:[{t:"问怎么样",f:"What + is + 主语 + like + ？",ex:[["What","q"],["is","be"],["the climate","s"],["like","p"],["?",""]]}]},
+"55-0":{fm:[{t:"日常习惯",f:"主语 + usually + 动词(s) + 时间",ex:[["I","s"],["usually","adv"],["get up","v"],["at seven","t"],[".",""]]}]},
+"57-0":{fm:[{t:"习惯（一般现在时）",f:"主语 + usually + 动词(s)",ex:[["He","s"],["usually","adv"],["drinks","v"],["tea","o"],[".",""]]},{t:"此刻（现在进行时）",f:"主语 + be动词 + 动词-ing + now / today",ex:[["Today","t"],["he","s"],["is","be"],["drinking","v"],["coffee","o"],[".",""]]}]},
+"59-0":{fm:[{t:"有",f:"主语 + have / has + 东西",ex:[["She","s"],["has","v"],["some envelopes","o"],[".",""]]},{t:"一般疑问句",f:"Do + 主语 + have + any + 东西 + ？",ex:[["Do","aux"],["you","s"],["have","v"],["any glue","o"],["?",""]]}]},
+"61-0":{fm:[{t:"生病",f:"主语 + have / has + a + 病",ex:[["I","s"],["have","v"],["a headache","o"],[".",""]]}]},
+"61-1":{fm:[{t:"感觉 / 看起来",f:"主语 + feel / look + 形容词",ex:[["You","s"],["look","lk"],["tired","c"],[".",""]]}]},
+"63-0":{fm:[{t:"禁止",f:"主语 + mustn't + 动词原形",ex:[["He","s"],["mustn't","aux"],["get up","v"],["yet","t"],[".",""]]},{t:"不必",f:"主语 + needn't + 动词原形",ex:[["You","s"],["needn't","aux"],["come","v"],["tomorrow","t"],[".",""]]}]},
+"65-0":{fm:[{t:"玩得开心",f:"enjoy + 反身代词",ex:[["Enjoy","v"],["yourselves","o"],["!",""]]}]},
+"67-0":{fm:[{t:"过去在哪",f:"主语 + was / were + 地点 + 过去时间",ex:[["I","s"],["was","be"],["at home","pp"],["yesterday","t"],[".",""]]},{t:"一般疑问句",f:"Was / Were + 主语 + … + ？",ex:[["Were","be"],["you","s"],["ill","c"],["?",""]]}]},
+"69-0":{fm:[{t:"过去有",f:"There + was / were + 东西 + 过去时间",ex:[["There","s0"],["was","be"],["a race","s"],["last year","t"],[".",""]]}]},
+"71-0":{fm:[{t:"一般过去时",f:"主语 + 动词-ed + 过去时间",ex:[["He","s"],["telephoned","v"],["me","o"],["yesterday","t"],[".",""]]}]}
+};
+
+/* 术语表：[名称, [匹配写法], 解释, 例句, 例句中文] ；分组见 GLG */
+const GL=[
+["句子成分",["句子成分"],"一个句子由几块组成，最常见的是主语、谓语（动词）、宾语、表语。认出这几块，句子怎么变就清楚了。","This is my pen.","这（主语）是（be动词）我的笔（表语）。"],
+["主语",["主语"],"句子说的是「谁」或「什么」，一般放在句子最前面。","He is busy.","主语是 He（他）。"],
+["谓语",["谓语"],"说明主语「是什么」或「做什么」的部分，核心是动词。英语句子一定要有谓语动词，中文常常可以省略，所以中国人容易漏。","He is busy.","is 就是谓语动词，不能省。"],
+["表语",["表语"],"跟在 be动词后面，说明主语「是什么」或「怎么样」。可以是名词，也可以是形容词。","This is my pen. / He is busy.","my pen 和 busy 都是表语。"],
+["宾语",["宾语"],"动作的对象，放在动词或介词后面。代词作宾语时要用宾格（me、him、her…）。","Give me a book.","me 和 a book 都是宾语。"],
+["定语",["后置定语","定语"],"修饰名词、说明「什么样的」或「哪一个」的部分。形容词定语放名词前（a new dress）；介词短语定语放名词后（the book on the desk），这叫后置定语。","the glasses on the shelf","on the shelf 说明是哪些杯子。"],
+["名词",["名词"],"人、事物、地点的名称。","pen, teacher, kitchen","笔、老师、厨房"],
+["代词",["代词"],"用来代替名词，避免重复。","I, you, he, she, it, we, they","我、你、他、她、它、我们、他们"],
+["主格",["主格"],"代词作主语时的形式。","I, he, she, we, they","放在句首当主语"],
+["宾格",["宾格"],"代词作宾语时的形式，放在动词或介词后面。","me, him, her, us, them","Give me… / Give it to her."],
+["物主代词",["物主代词"],"表示「…的」，后面接名词。","my, your, his, her, its, our, their","my pen（我的笔）"],
+["名词所有格",["名词所有格","所有格"],"名词后面加 's，表示「…的」。","Tim's shirt","蒂姆的衬衫"],
+["反身代词",["反身代词"],"表示「…自己」，以 -self 或 -selves 结尾。","myself, yourself, themselves","I can do it myself."],
+["动词",["动词"],"表示动作或状态的词。英语动词会随人称、时间变化形式。","open, like, go","打开、喜欢、去"],
+["be动词",["be动词","be 动词","Be动词"],"am、is、are（过去式 was、were），意思大致是「是」，作用是把主语和后面的说明连起来。I 配 am，he/she/it 配 is，you/we/they 配 are。","I am a nurse. / She is busy.","am 和 is 都是 be动词。"],
+["实义动词",["实义动词"],"有具体意思的动词，比如 like（喜欢）、want（想要）、open（打开）。和 be动词不同，它变疑问句、否定句时要请助动词 do / does 帮忙。","I like coffee.","like 是实义动词。"],
+["助动词",["助动词"],"本身没有意思，只是帮忙构成疑问句、否定句，比如 do、does、did。","Do you like tea?","Do 是助动词，「喜欢」的意思在 like 上。"],
+["情态动词",["情态动词"],"表示能力、必须、可以等态度，比如 can、must。后面永远接动词原形，也没有 -s 变化。","I can swim. / You must go.","can、must 是情态动词。"],
+["系动词",["系动词"],"像 be动词一样，把主语和后面的形容词连起来，比如 look（看起来）、feel（感觉）。后面接形容词。","You look tired.","look 是系动词，tired 是形容词。"],
+["动词原形",["动词原形","原形"],"动词最基本、没有任何变化的样子，就是词典里写的那个形式。","go, like, open","不加 s、不加 ing、不加 ed"],
+["形容词",["形容词"],"描述人或物的样子、性质，比如颜色、大小、好坏。","new, busy, red","新的、忙的、红的"],
+["副词",["副词"],"修饰动词、形容词或整个句子，比如 very、often、usually。","He works hard.","hard 修饰 works。"],
+["频度副词",["频度副词"],"表示多久做一次：always 总是 > usually 通常 > often 经常 > sometimes 有时 > never 从不。","It often rains.","often 放在实义动词 rains 前面。"],
+["介词",["介词"],"表示位置、方向、时间关系的小词，比如 in、on、under、at。后面接名词或宾格代词。","on the table","在桌子上"],
+["介词短语",["介词短语"],"介词加上后面的名词，比如 on the shelf、in the kitchen。","in the kitchen","在厨房里"],
+["冠词",["冠词"],"放在名词前面的 a、an、the。a / an 表示「一个」（泛指），the 表示「这个、那个」（特指）。","a pen / the pen","一支笔 / 那支笔"],
+["元音",["元音音素","元音"],"发音时气流不受阻碍的音，比如 /æ/、/iː/、/ə/。决定用 a 还是 an 时看的就是这个。","an apple / an hour","apple、hour 都是元音开头"],
+["辅音",["辅音音素","辅音"],"发音时气流受到阻碍的音，比如 /p/、/t/、/j/。","a book / a university","university 开头是 /j/，是辅音"],
+["陈述句",["陈述句"],"说明一个事实或看法的句子，句尾是句号。有肯定和否定两种。","This is my pen.","这是我的笔。"],
+["疑问句",["疑问句"],"提问的句子，句尾是问号。主要分两种：一般疑问句（回答 Yes / No）和特殊疑问句（用 what、who 等提问）。","Is this your pen? / What is your name?","两种问句"],
+["一般疑问句",["一般疑问句"],"可以用 Yes 或 No 回答的问句，句尾读升调 ↗。做法：把 be动词、情态动词（can、must）或助动词（do、does）放到主语前面。","Is this your pen? — Yes, it is.","这是你的笔吗？——是的。"],
+["特殊疑问句",["特殊疑问句"],"用疑问词开头、问具体信息的问句，不能用 Yes / No 回答，句尾读降调 ↘。结构：疑问词 + 一般疑问句。","What is your name?","你叫什么名字？"],
+["选择疑问句",["选择疑问句"],"给出两个选项让对方选，用 or 连接。回答时直接选，不能说 Yes / No。","Large or small? — Small, please.","大的还是小的？——小的。"],
+["疑问词",["疑问词"],"what 什么，who 谁，whose 谁的，where 哪里，which 哪个，how 怎样，when 什么时候。","Where is the cooker?","Where 是疑问词。"],
+["祈使句",["祈使句"],"表示命令、请求、提醒的句子。省略主语 you，直接用动词原形开头；否定在前面加 Don't。","Open the window. / Don't drop it!","开窗。/ 别摔了！"],
+["肯定句",["肯定句"],"不含 not 的陈述句。","He is busy.","他很忙。"],
+["否定句",["否定句"],"含 not 的句子。be动词、情态动词、助动词后面加 not：is not（isn't）、can not（can't）、do not（don't）。","He isn't busy.","他不忙。"],
+["简略回答",["简略回答","简答"],"回答一般疑问句时，只说 Yes / No + 主语代词 + be动词（或助动词），不重复整句。肯定简答句末不缩写。","Is this your pen? — Yes, it is.","不能说 Yes, it's."],
+["缩写",["缩写"],"两个词连在一起写，口语常用：is not → isn't，I am → I'm，it is → it's，do not → don't。","It's my pen.","= It is my pen."],
+["升调",["升调"],"句尾声音往上扬 ↗，用在一般疑问句和没听清时的 Pardon?","Is this your pen? ↗",""],
+["降调",["降调"],"句尾声音往下落 ↘，用在陈述句、特殊疑问句和祈使句。","What is your name? ↘",""],
+["单数",["单数"],"只有一个。","a pen, one book","一支笔"],
+["复数",["不规则复数","复数"],"两个或以上。一般在名词后加 s 或 es；少数词变化不规则，比如 man → men，child → children。","two pens, three men","两支笔，三个男人"],
+["可数名词",["可数名词","可数"],"可以一个一个数的东西，有单复数：a cup, two cups。","an egg, two eggs",""],
+["不可数名词",["不可数名词","不可数"],"没法一个一个数的东西，比如 bread、water、sugar。不能加 a 或 s，要用量词表示数量。","a loaf of bread","一条面包"],
+["量词",["量词"],"给不可数名词计数用的，比如 a cup of、a loaf of、a bar of。","a cup of tea","一杯茶"],
+["人称",["第三人称单数","三单","人称"],"I / we 是第一人称，you 是第二人称，he / she / it / they 是第三人称。主语是 he、she、it 或一个人、一样东西时（第三人称单数，简称「三单」），一般现在时的动词要加 s。","He likes beef.","He 是三单，所以 like 加 s。"],
+["时态",["时态"],"动词用不同形式表示事情发生的时间。一册里学到：一般现在时、现在进行时、be going to、一般过去时。","I work. / I'm working. / I worked.","我工作 / 我正在工作 / 我工作过"],
+["一般现在时",["一般现在时"],"表示经常、习惯性的事，或一直如此的事实。动词用原形，三单加 s。","I usually get up at seven.","我通常七点起床。"],
+["现在进行时",["现在进行时","进行时"],"表示此刻正在做的事。结构：am / is / are + 动词-ing。","She is reading now.","她正在看书。"],
+["一般过去时",["一般过去时","过去式"],"表示过去发生的事。be动词变成 was / were，其他动词一般加 -ed。","I was at home yesterday.","我昨天在家。"],
+["双宾语",["双宾语"],"有些动词后面可以接两个宾语：一个是人，一个是物，比如 give、show、send。","Give me the book.","me 是人，the book 是物。"],
+["重读闭音节",["重读闭音节","双写"],"以「一个元音字母 + 一个辅音字母」结尾、而且重读的音节，比如 sit、run、stop。加 -ing 或 -ed 时要双写最后的字母：sitting、running、stopped。","sit → sitting",""]
+];
+const GLG=[["句子由什么组成",0,6],["词的种类",6,28],["句子的种类",28,41],["名词的变化",41,47],["时态",47,51],["其他",51,GL.length]];
+const GLM={}; GL.forEach(g=>GLM[g[0]]=g);
+const GPAT=GL.flatMap(g=>g[1].map(p=>[p,g[0]])).sort((a,b)=>b[0].length-a[0].length);
+function linkify(text,all){
+  let s=esc(text); const toks=[]; const used=new Set();
+  for(const [p,k] of GPAT){
+    const ep=esc(p); if(!s.includes(ep)) continue;
+    if(!all&&used.has(k)) continue;
+    const mk=()=>{toks.push(`<button class="term" data-t="${esc(k)}">${ep}</button>`);return "\u0001"+(toks.length-1)+"\u0002";};
+    if(all) s=s.split(ep).join("\u0003").replace(/\u0003/g,mk);
+    else { s=s.replace(ep,mk); }
+    used.add(k);
+  }
+  return s.replace(/\u0001(\d+)\u0002/g,(m,i)=>toks[+i]);
+}
+
 const KEY="nce1-v1";
 let st={last:null,done:{},rep:{},star:{}};
 try{const r=localStorage.getItem(KEY); if(r) st=Object.assign(st,JSON.parse(r));}catch(e){}
@@ -575,7 +742,8 @@ function home(){
   <button class="resume" id="resume">
     <span style="min-width:0"><small>${st.last?"继续上次":"从这里开始"} · <span class="mono">${lab(last)}</span></small><span class="en">${esc(last.t)}</span></span>
     <span class="go">继续</span></button>
-  <button class="phbtn" id="toph"><span><b>美式音标表</b><small>${PH.length} 个音标，每个配例词和口型提示</small></span><span class="ipa">/æ ɚ θ ð/</span></button>
+  <div class="tiles"><button class="phbtn" id="togl2"><span><b>语法入门</b><small>主语、be动词、疑问句…从零讲起</small></span></button>
+  <button class="phbtn" id="toph"><span><b>美式音标表</b><small>${PH.length} 个音标，配例词和口型</small></span></button></div>
   <p class="label">全部单元</p>
   <div class="list">${U.map(u=>{
     const reps=st.rep[u.n]?Object.keys(st.rep[u.n]).length:0;
@@ -585,6 +753,7 @@ function home(){
   <p class="note">目前收录第 1–72 课（36 个单元），每单元对应一组课：奇数课课文 + 偶数课练习。单词和语法点按教材排列，发音和音标统一用美式；教材本身是英式拼写，美国人说法不同的词会单独标出。跟读句是按本课语法自编的练习句，不是课文原文，课文请配合 Leo 老师的视频。学到第 73 课时告诉我，我把后面的补上。</p>`;
   $("#resume").onclick=()=>lesson(last.n);
   $("#toph").onclick=()=>phonetics();
+  $("#togl2").onclick=()=>glossary();
   $("#toset").onclick=settings;
   document.querySelectorAll(".row").forEach(b=>b.onclick=()=>lesson(+b.dataset.u));
   window.scrollTo(0,0);
@@ -648,19 +817,29 @@ function words(){
 
 function gram(){
   const g=G[cur.n];
-  const pt=(p,i)=>`<section class="gp">
+  const sent=ex=>ex.map(e=>e[0]).join(" ").replace(/\s+([?.!,])/g,"$1");
+  const fmc=f=>`<div class="fmc"><div class="fmh"><span class="fml">${esc(f.t)}</span><span class="fmf">${linkify(f.f,true)}</span></div>
+    <button class="chips" data-s="${esc(sent(f.ex))}" aria-label="朗读例句">${f.ex.map(([w,r])=>r?`<span class="ch r-${r}"><b>${esc(w)}</b><i>${ROLE[r]}</i></span>`:`<span class="ch pl"><b>${esc(w)}</b></span>`).join("")}</button></div>`;
+  const pt=(p,i)=>{const x=FM[cur.n+"-"+i]||{}; return `<section class="gp">
     <p class="gk mono">要点 ${i+1} / ${g.p.length}</p>
-    <h3>${esc(p.h)}</h3><p class="gb">${esc(p.b)}</p>
+    <h3>${linkify(p.h)}</h3><p class="gb">${linkify(p.b)}</p>
+    ${x.fm?`<p class="ek" style="margin-top:12px">句型公式 · 点例句可以听</p><div class="fms">${x.fm.map(fmc).join("")}</div>`:""}
+    ${x.st?`<p class="ek" style="margin-top:14px">一步步变</p><ol class="st2">${x.st.map(s=>`<li>${linkify(s)}</li>`).join("")}</ol>`:""}
+    <p class="ek" style="margin-top:14px">更多例句</p>
     <div class="forms">${p.f.map(f=>`<div class="fr"><span class="fl">${esc(f[0])}</span><button class="fe" data-s="${esc(f[1])}">${esc(f[1])}</button></div>`).join("")}</div>
-    ${p.e.length?`<div class="errs"><p class="ek">易错</p>${p.e.map(e=>`<div class="er"><div class="bad"><span class="mk">✗</span><s>${esc(e[0])}</s></div><div class="good"><span class="mk">✓</span><button class="fe" data-s="${esc(e[1])}">${esc(e[1])}</button></div><div class="why">${esc(e[2])}</div></div>`).join("")}</div>`:""}
-  </section>`;
+    ${p.e.length?`<div class="errs"><p class="ek">易错</p>${p.e.map(e=>`<div class="er"><div class="bad"><span class="mk">✗</span><s>${esc(e[0])}</s></div><div class="good"><span class="mk">✓</span><button class="fe" data-s="${esc(e[1])}">${esc(e[1])}</button></div><div class="why">${linkify(e[2])}</div></div>`).join("")}</div>`:""}
+  </section>`;};
   $("#panel").innerHTML=`<div class="gram">
+   <button class="intro" id="togl"><span>看不懂「主语」「be动词」这些词？</span><span>语法入门 ›</span></button>
+   <p class="how" style="margin:0 0 14px">带虚线的词可以点开看解释。</p>
    ${g.p.map(pt).join("")}
    <section class="gp ext"><p class="ek">拓展 · 美国人这么说</p>${g.x.map(x=>`<div class="xr"><p>${esc(x[0])}</p>${x[1]?`<button class="fe" data-s="${esc(x[1])}">${esc(x[1])}</button>`:""}</div>`).join("")}</section>
    <section class="gp"><p class="ek">小测 · 点一下看答案</p><div class="quiz">${g.q.map(q=>`<button class="qz"><span class="qq">${esc(q[0])}</span><span class="qa">${esc(q[1])}</span></button>`).join("")}</div></section>
    <p class="how">英文都可以点着听。用每个句型，换成自己身边的人和东西各说一句，比看十遍更有用。</p>
    <button class="btn finish" id="tos">去跟读 ›</button></div>`;
-  document.querySelectorAll(".gram .fe").forEach(b=>b.onclick=()=>speak(b.dataset.s,0.9));
+  document.querySelectorAll(".gram .fe, .gram .chips").forEach(b=>b.onclick=()=>speak(b.dataset.s,0.9));
+  bindTerms($("#panel"));
+  $("#togl").onclick=()=>glossary(cur.n);
   document.querySelectorAll(".qz").forEach(b=>b.onclick=()=>b.classList.toggle("show"));
   $("#tos").onclick=()=>lesson(cur.n,"s");
 }
@@ -680,6 +859,35 @@ function sheet(word){
   $("#shw").onclick=()=>speak(word,0.8);
   $("#shbg").onclick=$("#shx").onclick=()=>{s.hidden=true;s.innerHTML="";speechSynthesis.cancel()};
   speak(word,0.8);
+}
+function bindTerms(root){root.querySelectorAll(".term").forEach(b=>b.onclick=e=>{e.stopPropagation();termSheet(b.dataset.t)});}
+function termSheet(k){
+  const g=GLM[k]; if(!g) return; const s=$("#sheet");
+  s.innerHTML=`<div class="sh-bg" id="shbg"></div><div class="sh" role="dialog" aria-label="术语解释">
+   <div class="shh"><span class="tt">${esc(g[0])}</span><button class="shx" id="shx">关闭</button></div>
+   <p class="tdef">${linkify(g[2]).replace(new RegExp('<button class="term" data-t="'+esc(k).replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+'">([^<]*)</button>'),"$1")}</p>
+   ${g[3]?`<button class="tex fe" data-s="${esc(g[3].replace(/[↗↘]/g,""))}">${esc(g[3])}</button>`:""}${g[4]?`<p class="tzh">${esc(g[4])}</p>`:""}
+   <button class="chip" id="shgl" style="margin-top:14px">看全部术语 ›</button></div>`;
+  s.hidden=false;
+  const close=()=>{s.hidden=true;s.innerHTML="";speechSynthesis.cancel()};
+  $("#shbg").onclick=$("#shx").onclick=close;
+  const ex=s.querySelector(".tex"); if(ex) ex.onclick=()=>speak(ex.dataset.s,0.9);
+  bindTerms(s);
+  $("#shgl").onclick=()=>{close();glossary(cur&&tab==="g"?cur.n:null)};
+}
+function glossary(from){
+  speechSynthesis&&speechSynthesis.cancel&&speechSynthesis.cancel();
+  $("#app").innerHTML=`
+  <div class="bar"><div class="head"><button class="back" id="back">‹ ${from?"返回本课":"目录"}</button><h2>语法入门</h2><span class="lnum mono">${GL.length} 个术语</span></div></div>
+  <p class="how" style="margin-top:0">看语法讲解前，先认识这些词。不用一次背完，学到哪课遇到不懂的，再回来查。</p>
+  <div class="fmc" style="margin:16px 0 4px"><div class="fmh"><span class="fml">一个句子的骨架</span><span class="fmf">主语 + 谓语动词 + 宾语 / 表语</span></div>
+   <button class="chips" data-s="This is my pen."><span class="ch r-s"><b>This</b><i>主语</i></span><span class="ch r-be"><b>is</b><i>be动词</i></span><span class="ch r-c"><b>my pen</b><i>表语</i></span><span class="ch pl"><b>.</b></span></button>
+   <button class="chips" data-s="I like coffee."><span class="ch r-s"><b>I</b><i>主语</i></span><span class="ch r-v"><b>like</b><i>动词</i></span><span class="ch r-o"><b>coffee</b><i>宾语</i></span><span class="ch pl"><b>.</b></span></button></div>
+  ${GLG.map(gr=>`<p class="label" style="margin-top:24px">${gr[0]}</p><div class="gls">${GL.slice(gr[1],gr[2]).map(g=>`
+    <div class="gl"><p class="gt">${esc(g[0])}</p><p class="gd">${esc(g[2])}</p>${g[3]?`<button class="fe gx" data-s="${esc(g[3].replace(/[↗↘]/g,""))}">${esc(g[3])}</button>`:""}${g[4]?`<p class="gz">${esc(g[4])}</p>`:""}</div>`).join("")}</div>`).join("")}`;
+  document.querySelectorAll("#app .fe, #app .chips").forEach(b=>b.onclick=()=>speak(b.dataset.s,0.9));
+  $("#back").onclick=()=>from?lesson(from,"g"):home();
+  window.scrollTo(0,0);
 }
 function settings(){
   speechSynthesis&&speechSynthesis.cancel&&speechSynthesis.cancel();

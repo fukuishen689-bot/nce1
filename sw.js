@@ -1,10 +1,15 @@
-const C="nce1-v3";
-const FILES=["./", "icon-180.png", "icon-192.png", "icon-512.png", "index.html", "manifest.webmanifest"];
+const C="nce1-202611021040";
+const FILES=["index.html", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener("fetch",e=>{
-  if(e.request.method!=="GET") return;
-  e.respondWith(caches.match(e.request,{ignoreSearch:true}).then(r=>r||fetch(e.request).then(res=>{
-    if(res.ok&&new URL(e.request.url).origin===location.origin){const cp=res.clone();caches.open(C).then(c=>c.put(e.request,cp));}
-    return res;}).catch(()=>caches.match("index.html"))));
+  const r=e.request; if(r.method!=="GET") return;
+  const u=new URL(r.url); if(u.origin!==location.origin) return;
+  const page=r.mode==="navigate"||u.pathname.endsWith("/")||u.pathname.endsWith("index.html");
+  if(page){
+    e.respondWith(fetch(r,{cache:"no-store"}).then(res=>{const cp=res.clone();caches.open(C).then(c=>c.put("index.html",cp));return res;})
+      .catch(()=>caches.match("index.html")));
+    return;
+  }
+  e.respondWith(caches.match(r,{ignoreSearch:true}).then(c=>c||fetch(r).then(res=>{const cp=res.clone();caches.open(C).then(x=>x.put(r,cp));return res;})));
 });
